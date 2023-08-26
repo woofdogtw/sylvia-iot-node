@@ -1,4 +1,4 @@
-# Sylvia-IoT Go SDK
+# Sylvia-IoT Node.js SDK
 
 ![npm](https://img.shields.io/npm/v/sylvia-iot-sdk.svg?logo=npm)
 [![Documentation](https://img.shields.io/badge/docs-ok.svg)](https://woofdogtw.github.io/sylvia-iot-node/apidocs/sdk/)
