@@ -1,6 +1,6 @@
 {
   "name": "general-mq",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Chien-Hong Chan",
   "description": "General purposed interfaces for message queues.",
   "homepage": "https://woofdogtw.github.io/sylvia-iot-core",
