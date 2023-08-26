@@ -1,6 +1,6 @@
 # Sylvia-IoT Node.js SDK
 
-![npm](https://img.shields.io/npm/v/sylvia-iot-sdk.svg?logo=npm)
+[![npm](https://img.shields.io/npm/v/sylvia-iot-sdk.svg?logo=npm)](https://www.npmjs.com/package/sylvia-iot-sdk)
 [![Documentation](https://img.shields.io/badge/docs-ok.svg)](https://woofdogtw.github.io/sylvia-iot-node/apidocs/sdk/)
 ![CI](https://github.com/woofdogtw/sylvia-iot-node/actions/workflows/build-test.yaml/badge.svg)
 [![Coverage](https://raw.githubusercontent.com/woofdogtw/sylvia-iot-node/gh-pages/docs/coverage/sdk/badge.svg)](https://woofdogtw.github.io/sylvia-iot-node/coverage/sdk/)

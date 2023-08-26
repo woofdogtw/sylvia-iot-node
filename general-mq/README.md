@@ -1,6 +1,6 @@
 # general-mq
 
-![npm](https://img.shields.io/npm/v/general-mq.svg?logo=npm)
+[![npm](https://img.shields.io/npm/v/general-mq.svg?logo=npm)](https://www.npmjs.com/package/general-mq)
 [![Documentation](https://img.shields.io/badge/docs-ok.svg)](https://woofdogtw.github.io/sylvia-iot-node/apidocs/general-mq/)
 ![CI](https://github.com/woofdogtw/sylvia-iot-node/actions/workflows/build-test.yaml/badge.svg)
 [![Coverage](https://raw.githubusercontent.com/woofdogtw/sylvia-iot-node/gh-pages/docs/coverage/general-mq/badge.svg)](https://woofdogtw.github.io/sylvia-iot-node/coverage/general-mq/)
