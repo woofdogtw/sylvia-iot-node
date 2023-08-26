@@ -7,8 +7,8 @@ const { DataTypes } = require('general-mq/lib/constants');
 const { Client, ClientOptions } = require('../../api/http');
 const userapi = require('../../api/user');
 
-const AUTH_BASE = 'http://127.0.0.1:1080/auth';
-const COREMGR_BASE = 'http://127.0.0.1:1080/coremgr';
+const AUTH_BASE = 'http://localhost:1080/auth';
+const COREMGR_BASE = 'http://localhost:1080/coremgr';
 const CLIENT_ID = 'private';
 const CLIENT_SECRET = 'secret';
 

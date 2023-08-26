@@ -21,8 +21,8 @@ const CLIENT = 'public';
 const REDIRECT = 'http://localhost:1080/auth/oauth2/redirect';
 
 // API information.
-const AUTH_URI = 'http://127.0.0.1:1080/auth/api/v1/auth/tokeninfo';
-const AUTH_URI_BASE = 'http://127.0.0.1:1080/auth/oauth2';
+const AUTH_URI = 'http://localhost:1080/auth/api/v1/auth/tokeninfo';
+const AUTH_URI_BASE = 'http://localhost:1080/auth/oauth2';
 
 let accessToken;
 
