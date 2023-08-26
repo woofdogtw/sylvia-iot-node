@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: api/http.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: api/http.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+const { Agent } = require('http');
+
+const superagent = require('superagent');
+
+const { DataTypes } = require('general-mq/lib/constants');
+
+const keepAliveAgent = new Agent({ keepAlive: true });
+
+/**
+ * Options of the HTTP client `Client` that contains OAuth2 information.
+ *
+ * @typedef {Object} ClientOptions
+ * @property {string} authBase `sylvia-iot-auth` base path with scheme. For example
+ *           `http://localhost:1080/auth`.
+ * @property {string} coremgrBase `sylvia-iot-coremgr` base path with scheme. For example
+ *           `http://localhost:1080/coremgr`.
+ * @property {string} clientId Client ID.
+ * @property {string} clientSecret Client secret.
+ */
+
+/**
+ * The HTTP client to request Sylvia-IoT APIs. With this client, you do not need to handle 401
+ * refresh token flow.
+ *
+ * @class Client
+ */
+class Client {
+  /**
+   * Create an instance.
+   *
+   * @param {ClientOptions} opts
+   * @throws {Error} Wrong arguments.
+   */
+  constructor(opts) {
+    if (!opts || typeof opts !== DataTypes.Object || Array.isArray(opts)) {
+      throw Error('`opts` is not an object');
+    } else if (!opts.authBase || typeof opts.authBase !== DataTypes.String) {
+      throw Error('`opts.authBase` is not a string');
+    } else if (!opts.coremgrBase || typeof opts.coremgrBase !== DataTypes.String) {
+      throw Error('`opts.coremgrBase` is not a string');
+    } else if (!opts.clientId || typeof opts.clientId !== DataTypes.String) {
+      throw Error('`opts.clientId` is not a string');
+    } else if (!opts.clientSecret || typeof opts.clientSecret !== DataTypes.String) {
+      throw Error('`opts.clientSecret` is not a string');
+    }
+
+    this.#authBase = opts.authBase;
+    this.#coremgrBase = opts.coremgrBase;
+    this.#clientId = opts.clientId;
+    this.#clientSecret = opts.clientSecret;
+  }
+
+  /**
+   * Execute a Sylvia-IoT API request.
+   *
+   * @param {string} method
+   * @param {string} apiPath The relative path (of the coremgr base) the API with query string. For
+   *        example: `/api/v1/user/list?contains=word`, the client will do a request with
+            `http://coremgr-host/coremgr/api/v1/user/list?contains=word` URL.
+   * @param {Object} [body]
+   * @param {function} callback
+   *   @param {?Error} callback.err
+   *   @param {number} callback.status
+   *   @param {Object|Array} callback.body
+   * @throws {Error} Wrong arguments.
+   */
+  request(method, apiPath, body, callback) {
+    if (!method || typeof method !== DataTypes.String) {
+      throw Error('`method` is not a string');
+    } else if (!apiPath || typeof apiPath !== DataTypes.String) {
+      throw Error('`apiPath` is not a string');
+    }
+    if (typeof body === DataTypes.Function) {
+      callback = body;
+      body = undefined;
+    }
+    if (body !== undefined &amp;&amp; (!body || typeof body !== DataTypes.Object)) {
+      throw Error('`body` is not an object');
+    }
+    if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
+    }
+
+    let retry = 1;
+    let retStatus = 0;
+    let retBody = null;
+    const self = this;
+    (function innerRequest() {
+      if (retry &lt; 0) {
+        return void callback(null, retStatus, retBody);
+      }
+
+      if (!self.#accessToken) {
+        return void self.#authToken((err, token) => {
+          if (err) {
+            return void callback(err);
+          }
+          self.#accessToken = token;
+          retry--;
+          innerRequest();
+        });
+      }
+
+      superagent(method, `${self.#coremgrBase}${apiPath}`)
+        .agent(keepAliveAgent)
+        .set('Authorization', `Bearer ${self.#accessToken}`)
+        .send(body)
+        .buffer(false)
+        .end((err, res) => {
+          if (!res) {
+            return void callback(err || Error(JSON.stringify({ code: 'err_rsc' })));
+          }
+          let body = res.body;
+          if (res.body.length > 0) {
+            // Try to parse JSON body.
+            try {
+              body = JSON.parse(res.body.toString());
+            } catch (e) {}
+          }
+
+          retStatus = res.statusCode;
+          retBody = body;
+          if (res.statusCode === 401) {
+            return void self.#authToken((err, token) => {
+              if (err) {
+                return void callback(err);
+              }
+              self.#accessToken = token;
+              retry--;
+              innerRequest();
+            });
+          }
+          callback(null, retStatus, retBody);
+        });
+    })();
+  }
+
+  /**
+   * To authorize the client and get access token/refresh token.
+   *
+   * @param {function} callback
+   *   @param {?Error} callback.err
+   *   @param {string} callback.token The access token.
+   * @throws {Error} Wrong arguments.
+   */
+  #authToken(callback) {
+    if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
+    }
+    const url = `${this.#authBase}/oauth2/token`;
+    const body = { grant_type: 'client_credentials' };
+    superagent
+      .agent(keepAliveAgent)
+      .post(url)
+      .auth(this.#clientId, this.#clientSecret)
+      .type('form')
+      .accept('application/json')
+      .send(body)
+      .redirects(0)
+      .end((err, res) => {
+        if (!res) {
+          const body = {
+            code: 'err_rsc',
+            message: `${err}`,
+          };
+          return void callback(Error(JSON.stringify(body)));
+        } else if (res.statusCode !== 200) {
+          return void callback(Error(JSON.stringify(res.body)));
+        }
+        callback(null, res.body.access_token);
+      });
+  }
+
+  /**
+   * `sylvia-iot-auth` base path.
+   *
+   * @type {string}
+   */
+  #authBase;
+  /**
+   * `sylvia-iot-coremgr` base path.
+   *
+   * @type {string}
+   */
+  #coremgrBase;
+  /**
+   * Client ID.
+   *
+   * @type {string}
+   */
+  #clientId;
+  /**
+   * Client secret.
+   *
+   * @type {string}
+   */
+  #clientSecret;
+  /**
+   * The access token.
+   *
+   * @type {string}
+   */
+  #accessToken;
+}
+
+module.exports = {
+  Client,
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ApplicationMgr.html">ApplicationMgr</a></li><li><a href="Client.html">Client</a></li><li><a href="Connection.html">Connection</a></li><li><a href="NetworkMgr.html">NetworkMgr</a></li></ul><h3>Events</h3><ul><li><a href="ApplicationMgr.html#event:status">status</a></li><li><a href="NetworkMgr.html#event:status">status</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CtrlOp">CtrlOp</a></li><li><a href="global.html#Errors">Errors</a></li><li><a href="global.html#MgrStatus">MgrStatus</a></li><li><a href="global.html#authMiddleware">authMiddleware</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#update">update</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sat Aug 26 2023 11:37:28 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
