@@ -1,0 +1,27 @@
+name: Release Sylvia-IoT SDK
+on:
+  push:
+    tags:
+      - v*
+jobs:
+  npm:
+    name: Publish NPM
+    runs-on: ubuntu-20.04
+    env:
+      NPM_REGISTRY_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
+      RELEASE_VER: ${{ github.ref_name }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Login to registry.npmjs.org
+        run: |
+          npm set "//registry.npmjs.org/:_authToken" ${{ secrets.NPM_REGISTRY_TOKEN }}
+      - name: Publish general-mq
+        run: |
+          npm publish -w general-mq
+      - name: Publish sylvia-iot-sdk
+        run: |
+          sed -i "s,\"general-mq\": \".*\",\"general-mq\": \"${RELEASE_VER:1}\"," sdk/package.json
+          npm publish -w sdk

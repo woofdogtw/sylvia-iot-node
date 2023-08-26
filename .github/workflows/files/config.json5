@@ -1,0 +1,32 @@
+{
+    "log": {},
+    "server": {},
+    "auth": {
+        "db": {
+            "sqlite": {
+                "path": "test.db",                  // default: auth.db
+            },
+        },
+    },
+    "broker": {
+        "auth": "http://localhost:1080/auth",
+        "db": {
+            "sqlite": {
+                "path": "test.db",                  // default: broker.db
+            },
+        },
+    },
+    "coremgr": {
+        "auth": "http://localhost:1080/auth",
+        "broker": "http://localhost:1080/broker",
+    },
+    "data": {
+        "auth": "http://localhost:1080/auth",
+        "broker": "http://localhost:1080/broker",
+        "db": {
+            "sqlite": {
+                "path": "test.db",                  // default: data.db
+            },
+        },
+    },
+}

@@ -1,0 +1,31 @@
+{
+  "name": "general-mq",
+  "version": "0.0.1",
+  "author": "Chien-Hong Chan",
+  "description": "General purposed interfaces for message queues.",
+  "homepage": "https://woofdogtw.github.io/sylvia-iot-core",
+  "keywords": ["amqp", "mq", "mqtt"],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/woofdogtw/sylvia-iot-node.git"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.3",
+    "async": "^3.2.4",
+    "mqtt": "^5.0.3",
+    "randomstring": "^1.3.0"
+  },
+  "devDependencies": {
+    "jsdoc": "^4.0.2",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
+    "superagent": "^8.1.2"
+  },
+  "scripts": {
+    "badge": "genhtml ./coverage/lcov.info -o out; lcov_badge_generator -o coverage/badge.svg out/index.html",
+    "doc": "jsdoc lib -d doc -R README.md",
+    "test": "nyc -r html -r lcovonly -e js mocha"
+  }
+}

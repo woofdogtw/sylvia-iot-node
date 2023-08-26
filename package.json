@@ -1,0 +1,7 @@
+{
+  "name": "sylvia-iot-node",
+  "workspaces": [
+    "general-mq",
+    "sdk"
+  ]
+}

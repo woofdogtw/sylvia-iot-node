@@ -1,0 +1,91 @@
+name: Build and Test
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+env:
+  LCOV_BADGE_VER: v0.2.0
+jobs:
+  general-mq-sdk:
+    name: Build and test general-mq and sdk
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+    services:
+      rabbitmq:
+        image: rabbitmq:3.12.3-management-alpine
+        ports:
+          - 5671:5671
+          - 5672:5672
+          - 15672:15672
+      emqx:
+        image: emqx/emqx:5.1.4
+        ports:
+          - 1883:1883
+          - 8883:8883
+          - 18083:18083
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Install tools
+        run: |
+          sudo apt -y install lcov
+          curl -kLO https://github.com/romainreignier/lcov_badge_generator/releases/download/$LCOV_BADGE_VER/lcov_badge_generator
+          chmod +x lcov_badge_generator
+          sudo install lcov_badge_generator /usr/local/bin
+          curl -LO https://github.com/woofdogtw/sylvia-iot-core/releases/latest/download/sylvia-iot-core.tar.xz
+          tar xf sylvia-iot-core.tar.xz
+      - name: Run sylvia-iot-core with the specified config file
+        run: |
+          sqlite3 test.db < $(pwd)/.github/workflows/files/test.db.sql
+          ./sylvia-iot-core -f $(pwd)/.github/workflows/files/config.json5 > /dev/null &
+      - name: Install packages
+        run: |
+          npm install
+      - name: Run test - general-mq
+        uses: nick-fields/retry@v2.8.3
+        env:
+          PROJ: "general-mq"
+        with:
+          timeout_minutes: 60
+          max_attempts: 5
+          command: |
+            npm run test -w $PROJ
+      - name: Run test - sdk
+        uses: nick-fields/retry@v2.8.3
+        env:
+          PROJ: "sdk"
+        with:
+          timeout_minutes: 60
+          max_attempts: 5
+          command: |
+            npm run test -w $PROJ
+      - name: Collect coverage
+        run: |
+          npm run badge -w general-mq
+          npm run badge -w sdk
+          mkdir ./coverage
+          cp -r ./general-mq/coverage ./coverage/general-mq
+          cp -r ./sdk/coverage ./coverage/sdk
+      - name: Publish coverage
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        with:
+          folder: ./coverage
+          target-folder: docs/coverage
+      - name: Run doc
+        run: |
+          npm run doc -w general-mq
+          npm run doc -w sdk
+          mkdir apidocs
+          cp -r general-mq/doc apidocs/general-mq
+          cp -r sdk/doc apidocs/sdk
+      - name: Publish documents
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        with:
+          folder: ./apidocs
+          target-folder: docs/apidocs
