@@ -13,23 +13,23 @@ jobs:
     name: Build and test general-mq and sdk
     permissions:
       contents: write
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     services:
       rabbitmq:
-        image: rabbitmq:3.12.3-management-alpine
+        image: rabbitmq:3.13.2-management-alpine
         ports:
           - 5671:5671
           - 5672:5672
           - 15672:15672
       emqx:
-        image: emqx/emqx:5.1.4
+        image: emqx/emqx:5.6.1
         ports:
           - 1883:1883
           - 8883:8883
           - 18083:18083
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install tools
         run: |
           sudo apt -y install lcov
@@ -46,7 +46,7 @@ jobs:
         run: |
           npm install
       - name: Run test - general-mq
-        uses: nick-fields/retry@v2.8.3
+        uses: nick-fields/retry@v3
         env:
           PROJ: "general-mq"
         with:
@@ -55,7 +55,7 @@ jobs:
           command: |
             npm run test -w $PROJ
       - name: Run test - sdk
-        uses: nick-fields/retry@v2.8.3
+        uses: nick-fields/retry@v3
         env:
           PROJ: "sdk"
         with:
@@ -72,7 +72,7 @@ jobs:
           cp -r ./sdk/coverage ./coverage/sdk
       - name: Publish coverage
         if: ${{ github.event_name != 'pull_request' }}
-        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: ./coverage
           target-folder: docs/coverage
@@ -85,7 +85,7 @@ jobs:
           cp -r sdk/doc apidocs/sdk
       - name: Publish documents
         if: ${{ github.event_name != 'pull_request' }}
-        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: ./apidocs
           target-folder: docs/apidocs
