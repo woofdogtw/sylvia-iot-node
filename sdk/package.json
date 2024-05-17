@@ -1,10 +1,12 @@
 {
   "name": "sylvia-iot-sdk",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "author": "Chien-Hong Chan",
   "description": "SDK for developing networks (adapters) and applications on Sylvia-IoT.",
   "homepage": "https://woofdogtw.github.io/sylvia-iot-core",
-  "keywords": ["iot"],
+  "keywords": [
+    "iot"
+  ],
   "license": "MIT",
   "main": "index.js",
   "repository": {
@@ -12,17 +14,17 @@
     "url": "https://github.com/woofdogtw/sylvia-iot-node.git"
   },
   "dependencies": {
-    "async": "^3.2.4",
+    "async": "^3.2.5",
     "general-mq": "file:../general-mq",
     "superagent": "^8.1.2"
   },
   "devDependencies": {
-    "deep-equal": "^2.2.2",
-    "express": "^4.18.2",
-    "jsdoc": "^4.0.2",
-    "mocha": "^10.2.0",
+    "deep-equal": "^2.2.3",
+    "express": "^4.19.2",
+    "jsdoc": "^4.0.3",
+    "mocha": "^10.4.0",
     "nyc": "^15.1.0",
-    "supertest": "^6.3.3"
+    "supertest": "^7.0.0"
   },
   "scripts": {
     "badge": "genhtml ./coverage/lcov.info -o out; lcov_badge_generator -o coverage/badge.svg out/index.html",
