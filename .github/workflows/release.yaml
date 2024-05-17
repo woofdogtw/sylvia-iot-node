@@ -6,13 +6,13 @@ on:
 jobs:
   npm:
     name: Publish NPM
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       NPM_REGISTRY_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
       RELEASE_VER: ${{ github.ref_name }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
       - name: Login to registry.npmjs.org
