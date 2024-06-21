@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 - 2024-06-21
+
+### Changed
+
+- Update dependencies and fix vulnerabilities.
+
 ## 0.1.0 - 2024-05-17
 
 ### Changed
