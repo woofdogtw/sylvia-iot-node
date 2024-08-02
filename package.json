@@ -1,5 +1,6 @@
 {
   "name": "sylvia-iot-node",
+  "version": "0.1.2",
   "workspaces": [
     "general-mq",
     "sdk"

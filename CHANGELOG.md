@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2 - 2024-08-02
+
+### Added
+
+- Add SBOM (SPDX and CycloneDX JSON using `npm sbom`) for Releases. See `sbom.tar.xz` in Releases.
+
+### Changed
+
+- Update dependencies.
+
 ## 0.1.1 - 2024-06-21
 
 ### Changed
