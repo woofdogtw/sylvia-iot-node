@@ -36,6 +36,7 @@ jobs:
       - name: Prepare SBOM
         run: |
           mkdir -p ${SBOM_DIR}
+          npm i
           npm sbom -w general-mq --sbom-format spdx > ${SBOM_DIR}/general-mq.spdx.json
           npm sbom -w general-mq --sbom-format cyclonedx > ${SBOM_DIR}/general-mq.cdx.json
           npm sbom -w sdk --sbom-format spdx > ${SBOM_DIR}/sdk.spdx.json
