@@ -3,9 +3,13 @@ on:
   push:
     tags:
       - v*
+env:
+  GHR_VER: v0.16.2
+  BIN_DIR: dist
+  SBOM_DIR: sbom
 jobs:
-  npm:
-    name: Publish NPM
+  release:
+    name: Publish NPM and GitHub Releases
     runs-on: ubuntu-22.04
     env:
       NPM_REGISTRY_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
@@ -25,3 +29,24 @@ jobs:
         run: |
           sed -i "s,\"general-mq\": \".*\",\"general-mq\": \"${RELEASE_VER:1}\"," sdk/package.json
           npm publish -w sdk
+      - name: Prepare assets
+        run: |
+          mkdir -p ${BIN_DIR}
+          echo -n ${RELEASE_VER:1} > ${BIN_DIR}/VERSION
+      - name: Prepare SBOM
+        run: |
+          mkdir -p ${SBOM_DIR}
+          npm sbom -w general-mq --sbom-format spdx > ${SBOM_DIR}/general-mq.spdx.json
+          npm sbom -w general-mq --sbom-format cyclonedx > ${SBOM_DIR}/general-mq.cdx.json
+          npm sbom -w sdk --sbom-format spdx > ${SBOM_DIR}/sdk.spdx.json
+          npm sbom -w sdk --sbom-format cyclonedx > ${SBOM_DIR}/sdk.cdx.json
+          tar cf sbom.tar sbom
+          xz -z -9 -e sbom.tar
+          mv sbom.tar.xz ${BIN_DIR}/
+      - name: Create releases, assets and version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -LO https://github.com/tcnksm/ghr/releases/download/${GHR_VER}/ghr_${GHR_VER}_linux_amd64.tar.gz
+          tar xf ghr_${GHR_VER}_linux_amd64.tar.gz
+          ./ghr_${GHR_VER}_linux_amd64/ghr -u "${GITHUB_REPOSITORY%/*}" -r "${GITHUB_REPOSITORY#*/}" "${GITHUB_REF#refs/tags/}" ${BIN_DIR}
