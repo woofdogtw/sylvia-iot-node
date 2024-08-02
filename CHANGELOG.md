@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3 - 2024-08-02
+
+### Fixed
+
+- Fix CI for releasing SBOM.
+
 ## 0.1.2 - 2024-08-02
 
 ### Added
