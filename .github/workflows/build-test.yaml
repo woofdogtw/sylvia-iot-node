@@ -16,13 +16,13 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       rabbitmq:
-        image: rabbitmq:3.13.3-management-alpine
+        image: rabbitmq:3.13.7-management-alpine
         ports:
           - 5671:5671
           - 5672:5672
           - 15672:15672
       emqx:
-        image: emqx/emqx:5.7.0
+        image: emqx/emqx:5.8.0
         ports:
           - 1883:1883
           - 8883:8883

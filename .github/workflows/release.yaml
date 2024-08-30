@@ -8,18 +8,17 @@ env:
   BIN_DIR: dist
   SBOM_DIR: sbom
 jobs:
-  release:
-    name: Publish NPM and GitHub Releases
+  npm:
+    name: Publish NPM
     runs-on: ubuntu-22.04
-    env:
-      NPM_REGISTRY_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
-      RELEASE_VER: ${{ github.ref_name }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
       - name: Login to registry.npmjs.org
+        env:
+          NPM_REGISTRY_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
         run: |
           npm set "//registry.npmjs.org/:_authToken" ${{ secrets.NPM_REGISTRY_TOKEN }}
       - name: Publish general-mq
@@ -27,9 +26,18 @@ jobs:
           npm publish -w general-mq
       - name: Publish sylvia-iot-sdk
         run: |
-          sed -i "s,\"general-mq\": \".*\",\"general-mq\": \"${RELEASE_VER:1}\"," sdk/package.json
           npm publish -w sdk
+  release:
+    name: Publish GitHub Releases
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
       - name: Prepare assets
+        env:
+          RELEASE_VER: ${{ github.ref_name }}
         run: |
           mkdir -p ${BIN_DIR}
           echo -n ${RELEASE_VER:1} > ${BIN_DIR}/VERSION
