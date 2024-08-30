@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.4 - 2024-08-30
+
+### Changed
+
+- Update dependencies.
+- Use release branch for NPM and GitHub Releases.
+
 ## 0.1.3 - 2024-08-02
 
 ### Fixed
