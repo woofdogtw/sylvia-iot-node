@@ -13,16 +13,16 @@ jobs:
     name: Build and test general-mq and sdk
     permissions:
       contents: write
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       rabbitmq:
-        image: rabbitmq:4.0.7-management-alpine
+        image: rabbitmq:4.1.0-management-alpine
         ports:
           - 5671:5671
           - 5672:5672
           - 15672:15672
       emqx:
-        image: emqx/emqx:5.8.5
+        image: emqx/emqx:5.9.0
         ports:
           - 1883:1883
           - 8883:8883
