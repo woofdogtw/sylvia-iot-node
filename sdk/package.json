@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "async": "^3.2.6",
-    "general-mq": "^0.1.6",
+    "general-mq": "^0.1.7",
     "superagent": "10.2.1"
   },
   "devDependencies": {
