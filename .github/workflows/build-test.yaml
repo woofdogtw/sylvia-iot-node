@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-24.04
     services:
       rabbitmq:
-        image: rabbitmq:4.1.0-management-alpine
+        image: rabbitmq:4.1.1-management-alpine
         ports:
           - 5671:5671
           - 5672:5672
@@ -36,8 +36,8 @@ jobs:
           curl -kLO https://github.com/romainreignier/lcov_badge_generator/releases/download/$LCOV_BADGE_VER/lcov_badge_generator
           chmod +x lcov_badge_generator
           sudo install lcov_badge_generator /usr/local/bin
-          curl -LO https://github.com/woofdogtw/sylvia-iot-core/releases/latest/download/sylvia-iot-core.tar.xz
-          tar xf sylvia-iot-core.tar.xz
+          curl -LO https://github.com/woofdogtw/sylvia-iot-core/releases/latest/download/sylvia-iot-core-x86_64.tar.xz
+          tar xf sylvia-iot-core-x86_64.tar.xz
       - name: Run sylvia-iot-core with the specified config file
         run: |
           sqlite3 test.db < $(pwd)/.github/workflows/files/test.db.sql
