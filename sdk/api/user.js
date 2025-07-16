@@ -1,7 +1,9 @@
 'use strict';
 
+const { SdkError } = require('general-mq');
 const { DataTypes } = require('general-mq/lib/constants');
 
+const { ErrorCode, HttpMethod } = require('./constants');
 const { Client } = require('./http');
 
 /**
@@ -26,59 +28,51 @@ const { Client } = require('./http');
 /**
  * `GET /coremgr/api/v1/user`.
  *
+ * @async
  * @param {Client} client
  * @param {function} callback
- *   @param {?Error} callback.err
- *   @param {GetResData} callback.data
+ * @returns {Promise<GetResData>}
  * @throws {Error} Wrong arguments.
+ * @throws {SdkError}
  */
-function get(client, callback) {
+async function get(client) {
   if (!(client instanceof Client)) {
     throw Error('`client` is not a Client');
-  } else if (typeof callback !== DataTypes.Function) {
-    throw Error('`callback` is not a function');
   }
 
-  client.request('GET', '/api/v1/user', (err, status, body) => {
-    if (err) {
-      return void callback(err);
-    } else if (status !== 200) {
-      return void callback(Error({ code: 'err_rsc', message: JSON.stringify(body) }));
-    }
-    const data = body.data;
-    data.createdAt = new Date(data.createdAt);
-    data.modifiedAt = new Date(data.modifiedAt);
-    if (data.verifiedAt) {
-      data.verifiedAt = new Date(data.verifiedAt);
-    }
-    callback(null, data);
-  });
+  const res = await client.request(HttpMethod.Get, '/api/v1/user');
+  if (res.status !== 200) {
+    throw SdkError({ code: ErrorCode.Rsc, message: JSON.stringify(res.body) });
+  }
+  const data = res.body.data;
+  data.createdAt = new Date(data.createdAt);
+  data.modifiedAt = new Date(data.modifiedAt);
+  if (data.verifiedAt) {
+    data.verifiedAt = new Date(data.verifiedAt);
+  }
+  return data;
 }
 
 /**
  * `PATCH /coremgr/api/v1/user`
  *
+ * @async
  * @param {Client} client
  * @param {PatchReqData} data
- * @param {function} callback
- *   @param {?Error} callback.err
  * @throws {Error} Wrong arguments.
+ * @throws {SdkError}
  */
-function update(client, data, callback) {
+async function update(client, data) {
   if (!(client instanceof Client)) {
     throw Error('`client` is not a Client');
   } else if (!data || typeof data !== DataTypes.Object || Array.isArray(data)) {
     throw Error('`data` is not an object');
-  } else if (typeof callback !== DataTypes.Function) {
-    throw Error('`callback` is not a function');
   }
 
-  client.request('PATCH', '/api/v1/user', { data }, (err, status, body) => {
-    if (err) {
-      return void callback(err);
-    }
-    callback(status === 204 ? null : Error({ code: 'err_rsc', message: JSON.stringify(body) }));
-  });
+  const res = await client.request(HttpMethod.Patch, '/api/v1/user', { data });
+  if (res.status !== 204) {
+    return { code: ErrorCode.Rsc, message: JSON.stringify(body) };
+  }
 }
 
 module.exports = {

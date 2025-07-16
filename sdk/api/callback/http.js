@@ -4,10 +4,9 @@ const { Agent } = require('http');
 
 const superagent = require('superagent');
 
-const { SdkError } = require('general-mq');
 const { DataTypes } = require('general-mq/lib/constants');
 
-const { ErrorCode } = require('./constants');
+const { ErrorCode } = require('../constants');
 
 const keepAliveAgent = new Agent({ keepAlive: true });
 
@@ -21,14 +20,6 @@ const keepAliveAgent = new Agent({ keepAlive: true });
  *           `http://localhost:1080/coremgr`.
  * @property {string} clientId Client ID.
  * @property {string} clientSecret Client secret.
- */
-
-/**
- * Client response.
- *
- * @typedef {Object} ClientResponse
- * @property {number} status Status code.
- * @property {Object|Array} body Body.
  */
 
 /**
@@ -66,94 +57,122 @@ class Client {
   /**
    * Execute a Sylvia-IoT API request.
    *
-   * @async
    * @param {string} method
    * @param {string} apiPath The relative path (of the coremgr base) the API with query string. For
    *        example: `/api/v1/user/list?contains=word`, the client will do a request with
             `http://coremgr-host/coremgr/api/v1/user/list?contains=word` URL.
    * @param {Object} [body]
-   * @returns {Promise<ClientResponse>}
+   * @param {function} callback
+   *   @param {?Error} callback.err
+   *   @param {number} callback.status
+   *   @param {Object|Array} callback.body
    * @throws {Error} Wrong arguments.
-   * @throws {SdkError}
    */
-  async request(method, apiPath, body) {
+  request(method, apiPath, body, callback) {
     if (!method || typeof method !== DataTypes.String) {
       throw Error('`method` is not a string');
     } else if (!apiPath || typeof apiPath !== DataTypes.String) {
       throw Error('`apiPath` is not a string');
-    } else if (body !== undefined && (!body || typeof body !== DataTypes.Object)) {
+    }
+    if (typeof body === DataTypes.Function) {
+      callback = body;
+      body = undefined;
+    }
+    if (body !== undefined && (!body || typeof body !== DataTypes.Object)) {
       throw Error('`body` is not an object');
     }
-
-    if (!this.#accessToken) {
-      this.#accessToken = await this.#authToken();
+    if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
     }
 
-    for (let retry = 1; retry >= 0; retry--) {
-      const res = await superagent(method, `${this.#coremgrBase}${apiPath}`)
+    let retry = 1;
+    let retStatus = 0;
+    let retBody = null;
+    const self = this;
+    (function innerRequest() {
+      if (retry < 0) {
+        return void callback(null, retStatus, retBody);
+      }
+
+      if (!self.#accessToken) {
+        return void self.#authToken((err, token) => {
+          if (err) {
+            return void callback(err);
+          }
+          self.#accessToken = token;
+          retry--;
+          innerRequest();
+        });
+      }
+
+      superagent(method, `${self.#coremgrBase}${apiPath}`)
         .agent(keepAliveAgent)
-        .set('Authorization', `Bearer ${this.#accessToken}`)
+        .set('Authorization', `Bearer ${self.#accessToken}`)
         .send(body)
         .buffer(false)
-        .ok((res) => !!res)
-        .catch((err) => {
-          throw SdkError({ code: ErrorCode.Rsc, message: `${err}` });
+        .end((err, res) => {
+          if (!res) {
+            return void callback(err || Error(JSON.stringify({ code: ErrorCode.Rsc })));
+          }
+          let body = res.body;
+          if (res.body.length > 0) {
+            // Try to parse JSON body.
+            try {
+              body = JSON.parse(res.body.toString());
+            } catch (e) {}
+          }
+
+          retStatus = res.statusCode;
+          retBody = body;
+          if (res.statusCode === 401) {
+            return void self.#authToken((err, token) => {
+              if (err) {
+                return void callback(err);
+              }
+              self.#accessToken = token;
+              retry--;
+              innerRequest();
+            });
+          }
+          callback(null, retStatus, retBody);
         });
-
-      if (res.statusCode === 401) {
-        this.#accessToken = await this.#authToken();
-        continue;
-      }
-
-      let retBody = res.body;
-      if (res.body.length > 0) {
-        // Try to parse JSON body.
-        try {
-          retBody = JSON.parse(res.body.toString());
-        } catch (e) {}
-      }
-      return {
-        status: res.statusCode,
-        body: retBody,
-      };
-    }
-    throw SdkError({
-      code: ErrorCode.Rsc,
-      message: 'exceed retry',
-    });
+    })();
   }
 
   /**
    * To authorize the client and get access token/refresh token.
    *
-   * @async
-   * @returns {Promise<string>} The access token.
+   * @param {function} callback
+   *   @param {?Error} callback.err
+   *   @param {string} callback.token The access token.
    * @throws {Error} Wrong arguments.
-   * @throws {SdkError}
    */
-  async #authToken() {
+  #authToken(callback) {
+    if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
+    }
     const url = `${this.#authBase}/oauth2/token`;
     const body = { grant_type: 'client_credentials' };
-    const res = await superagent
+    superagent
       .agent(keepAliveAgent)
       .post(url)
       .auth(this.#clientId, this.#clientSecret)
       .type('form')
       .accept('application/json')
       .send(body)
-      .ok((res) => !!res)
       .redirects(0)
-      .catch((err) => {
-        const body = {
-          code: ErrorCode.Rsc,
-          message: `${err}`,
-        };
-        throw SdkError(JSON.stringify(body));
+      .end((err, res) => {
+        if (!res) {
+          const body = {
+            code: ErrorCode.Rsc,
+            message: `${err}`,
+          };
+          return void callback(Error(JSON.stringify(body)));
+        } else if (res.statusCode !== 200) {
+          return void callback(Error(JSON.stringify(res.body)));
+        }
+        callback(null, res.body.access_token);
       });
-    if (res.statusCode !== 200) {
-      throw SdkError(JSON.stringify(res.body));
-    }
-    return res.body.access_token;
   }
 
   /**

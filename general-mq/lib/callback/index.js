@@ -1,11 +1,9 @@
 'use strict';
 
-const { AmqpConnection } = require('./lib/amqp-connection');
-const { AmqpQueue } = require('./lib/amqp-queue');
-const constants = require('./lib/constants');
-const { SdkError } = require('./lib/lib');
-const { MqttConnection } = require('./lib/mqtt-connection');
-const { MqttQueue } = require('./lib/mqtt-queue');
+const { AmqpConnection } = require('./amqp-connection');
+const { AmqpQueue } = require('./amqp-queue');
+const { MqttConnection } = require('./mqtt-connection');
+const { MqttQueue } = require('./mqtt-queue');
 
 /**
  * @typedef {Object} Engine
@@ -19,7 +17,6 @@ module.exports = {
     Connection: AmqpConnection,
     Queue: AmqpQueue,
   },
-  constants,
   /** @type {Engine} */
   mqtt: {
     Connection: MqttConnection,
@@ -29,5 +26,4 @@ module.exports = {
   AmqpQueue,
   MqttConnection,
   MqttQueue,
-  SdkError,
 };

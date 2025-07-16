@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0 - 2025-07-16
+
+### Changed
+
+- **breaking**: Use `async`/`await` to replace callback. Callback APIs are moved:
+  - From `general-mq/lib` to `general-mq/lib/callback`.
+  - From `sdk/api` to `sdk/api/callback`.
+  - From `sdk/mq` to `sdk/mq/callback`.
+- Update dependencies.
+
 ## 0.1.7 - 2025-06-13
 
 ### Changed

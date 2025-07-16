@@ -3,10 +3,9 @@
 const { EventEmitter } = require('events');
 const { URL } = require('url');
 
-const amqplib = require('amqplib');
+const amqplib = require('amqplib/callback_api');
 
-const { DataTypes, Events, Status } = require('./constants');
-const { SdkError } = require('./lib');
+const { DataTypes, Events, Status } = require('./../constants');
 
 const DEF_URI = 'amqp://localhost';
 const DEF_CONN_TIMEOUT = 3000;
@@ -114,60 +113,64 @@ class AmqpConnection extends EventEmitter {
   }
 
   /**
-   * To close the connection. You can use `await` to get the result or listen events.
+   * To close the connection. You can use a callback function to get the result or listen events.
    *
-   * @async
-   * @returns {Promise<void>}
-   * @throws {SdkError}
+   * @param {function} [callback]
+   *   @param {?Error} callback.err
    */
-  async close() {
+  close(callback) {
+    if (typeof callback !== DataTypes.Function) {
+      callback = null;
+    }
+
     if (!this.#conn || this.#status === Status.Closed || this.#status === Status.Closing) {
+      if (callback) {
+        return void process.nextTick(() => callback(null));
+      }
       return;
     }
 
     this.#status = Status.Closing;
     this.emit(Events.Status, Status.Closing);
-
-    let err;
-    await this.#conn.close().catch((e) => (err = e));
-    if (this.#conn) {
-      this.#conn.removeAllListeners();
-      this.#conn = null;
-    }
-    this.#status = Status.Closed;
-    this.emit(Events.Status, Status.Closed);
-    if (err) {
-      throw new SdkError(err.message);
-    }
+    this.#conn.close((err) => {
+      if (this.#conn) {
+        this.#conn.removeAllListeners();
+        this.#conn = null;
+      }
+      this.#status = Status.Closed;
+      this.emit(Events.Status, Status.Closed);
+      if (callback) {
+        return void process.nextTick(() => callback(err));
+      }
+    });
   }
 
   /**
    * To get the raw AMQP connection instance for channel declaration.
    *
    * @private
-   * @returns {?amqplib.ChannelModel} The connection instance.
+   * @returns {?amqplib.Connection} The connection instance.
    */
   getRawConnection() {
     return this.#conn;
   }
 
-  async #innerConnect() {
+  #innerConnect() {
     const opts = {};
     if (this.#opts.insecure) {
       opts.rejectUnauthorized = false;
     }
-
-    try {
-      const conn = await amqplib.connect(this.#opts.uri, opts);
+    amqplib.connect(this.#opts.uri, opts, (err, conn) => {
+      if (err) {
+        return void setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
+      }
 
       conn.on('close', this.#onClose.bind(this));
       conn.on('error', this.#onError.bind(this));
       this.#conn = conn;
       this.#status = Status.Connected;
       this.emit(Events.Status, Status.Connected);
-    } catch (_e) {
-      return void setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
-    }
+    });
   }
 
   #onClose() {
@@ -192,7 +195,7 @@ class AmqpConnection extends EventEmitter {
   #opts;
   /** @type {Status} */
   #status;
-  /** @type {amqplib.ChannelModel} */
+  /** @type {amqplib.Connection} */
   #conn;
 }
 

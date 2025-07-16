@@ -64,6 +64,14 @@ Launch RabbitMQ and then run AMQP example:
 
     $ node examples/simple.js
 
+or run AMQP with callback APIs:
+
+    $ RUN_CALLBACK= node examples/simple.js
+
 Launch EMQX and then run MQTT example:
 
     $ RUN_MQTT= node examples/simple.js
+
+or run MQTT with callback APIs:
+
+    $ RUN_CALLBACK= RUN_MQTT= node examples/simple.js

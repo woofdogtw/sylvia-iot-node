@@ -6,8 +6,7 @@ const { URL } = require('url');
 const mqtt = require('mqtt');
 const randomstring = require('randomstring');
 
-const { DataTypes, Events, QueuePattern, Status } = require('./constants');
-const { SdkError } = require('./lib');
+const { DataTypes, Events, QueuePattern, Status } = require('./../constants');
 
 const DEF_URI = 'mqtt://localhost';
 const DEF_CONN_TIMEOUT = 3000;
@@ -142,31 +141,37 @@ class MqttConnection extends EventEmitter {
   }
 
   /**
-   * To close the connection. You can use `await` to get the result or listen events.
+   * To close the connection. You can use a callback function to get the result or listen events.
    *
-   * @async
-   * @returns {Promise<void>}
-   * @throws {SdkError}
+   * @param {function} [callback]
+   *   @param {?Error} callback.err
    */
-  async close() {
+  close(callback) {
+    if (typeof callback !== DataTypes.Function) {
+      callback = null;
+    }
+
     if (!this.#conn || this.#status === Status.Closed || this.#status === Status.Closing) {
+      if (callback) {
+        return void process.nextTick(() => callback(null));
+      }
       return;
     }
 
     this.#status = Status.Closing;
     this.emit(Events.Status, Status.Closing);
 
-    let err;
-    await this.#conn.endAsync().catch((e) => (err = e));
-    if (this.#conn) {
-      this.#conn.removeAllListeners();
-      this.#conn = null;
-    }
-    this.#status = Status.Closed;
-    this.emit(Events.Status, Status.Closed);
-    if (err) {
-      throw new SdkError(err.message);
-    }
+    this.#conn.end((err) => {
+      if (this.#conn) {
+        this.#conn.removeAllListeners();
+        this.#conn = null;
+      }
+      this.#status = Status.Closed;
+      this.emit(Events.Status, Status.Closed);
+      if (callback) {
+        return void process.nextTick(() => callback(err));
+      }
+    });
   }
 
   /**
@@ -221,7 +226,7 @@ class MqttConnection extends EventEmitter {
     this.#packetHandlers.delete(name);
   }
 
-  async #innerConnect() {
+  #innerConnect() {
     const urlInfo = new URL(this.#opts.uri);
     const opts = {
       reconnectPeriod: this.#opts.reconnectMillis,
@@ -234,11 +239,7 @@ class MqttConnection extends EventEmitter {
       opts.rejectUnauthorized = false;
     }
 
-    try {
-      this.#conn = await mqtt.connect(this.#opts.uri, opts);
-    } catch (err) {
-      return void setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
-    }
+    this.#conn = mqtt.connect(this.#opts.uri, opts);
     this.#conn.on('close', this.#onClose.bind(this));
     this.#conn.on('connect', this.#onConnect.bind(this));
     this.#conn.on('error', this.#onError.bind(this));

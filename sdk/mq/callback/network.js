@@ -3,9 +3,10 @@
 const { EventEmitter } = require('events');
 const { URL } = require('url');
 
-const gmq = require('general-mq');
-const { AmqpQueue, MqttQueue, SdkError } = gmq;
-const { DataTypes, Status, Events } = gmq.constants;
+const async = require('async');
+
+const { AmqpQueue, MqttQueue } = require('general-mq/lib/callback');
+const { DataTypes, Status, Events } = require('general-mq').constants;
 const {
   Connection,
   DataMqStatus,
@@ -20,7 +21,7 @@ const {
   newDataQueues,
   removeConnection,
 } = require('./lib');
-const { MgrStatus } = require('./constants');
+const { MgrStatus } = require('../constants');
 
 /**
  * Uplink data from network to broker.
@@ -208,30 +209,47 @@ class NetworkMgr extends EventEmitter {
    * To close the manager queues.
    * The underlying connection will be closed when there are no queues use it.
    *
-   * @async
-   * @throws {SdkError}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    */
-  async close() {
-    this.#uldata.removeAllListeners();
-    await this.#uldata.close();
-    this.#dldata.removeAllListeners();
-    await this.#dldata.close();
-    this.#dldataResult.removeAllListeners();
-    await this.#dldataResult.close();
-    this.#ctrl.removeAllListeners();
-    await this.#ctrl.close();
-    await removeConnection(this.#connPool, this.#hostUri, 4);
+  close(callback) {
+    const self = this;
+
+    async.waterfall(
+      [
+        function (cb) {
+          self.#uldata.removeAllListeners();
+          self.#uldata.close((err) => cb(err || null));
+        },
+        function (cb) {
+          self.#dldata.removeAllListeners();
+          self.#dldata.close((err) => cb(err || null));
+        },
+        function (cb) {
+          self.#dldataResult.removeAllListeners();
+          self.#dldataResult.close((err) => cb(err || null));
+        },
+        function (cb) {
+          self.#ctrl.removeAllListeners();
+          self.#ctrl.close((err) => cb(err || null));
+        },
+        function (cb) {
+          removeConnection(self.#connPool, self.#hostUri, 4, (err) => cb(err || null));
+        },
+      ],
+      callback
+    );
   }
 
   /**
    * Send uplink data to the broker.
    *
-   * @async
    * @param {NetUlData} data
+   * @param {function} callback
+   *   @param {?Error} callback.err
    * @throws {Error} Wrong arguments.
-   * @throws {SdkError}
    */
-  async sendUlData(data) {
+  sendUlData(data, callback) {
     if (!data || typeof data !== DataTypes.Object || Array.isArray(data)) {
       throw Error('`data` is not an object');
     } else if (!data.time || !(data.time instanceof Date) || isNaN(data.time.getTime())) {
@@ -256,18 +274,18 @@ class NetworkMgr extends EventEmitter {
       extension: data.extension || undefined,
     };
     const payload = Buffer.from(JSON.stringify(uldata));
-    await this.#uldata.sendMsg(payload);
+    this.#uldata.sendMsg(payload, (err) => callback(err || null));
   }
 
   /**
    * Send downlink result data to the broker.
    *
-   * @async
    * @param {NetDlDataResult} data
+   * @param {function} callback
+   *   @param {?Error} callback.err
    * @throws {Error} Wrong arguments.
-   * @throws {SdkError}
    */
-  async sendDlDataResult(data) {
+  sendDlDataResult(data, callback) {
     if (!data || typeof data !== DataTypes.Object || Array.isArray(data)) {
       throw Error('`data` is not an object');
     } else if (!data.dataId || typeof data.dataId !== DataTypes.String) {
@@ -284,7 +302,7 @@ class NetworkMgr extends EventEmitter {
       message: data.message || undefined,
     };
     const payload = Buffer.from(JSON.stringify(dldataResult));
-    await this.#dldataResult.sendMsg(payload);
+    this.#dldataResult.sendMsg(payload, (err) => callback(err || null));
   }
 
   /**
@@ -318,27 +336,28 @@ class NetworkMgr extends EventEmitter {
     try {
       data = JSON.parse(msg.payload.toString());
     } catch (e) {
-      queue.ack(msg);
+      queue.ack(msg, (_err) => {});
       return;
     }
 
+    const self = this;
     if (queue.name() === this.#dldata.name()) {
       data.pub = new Date(data.pub);
       data.data = Buffer.from(data.data, 'hex');
       this.#mgrMsgHandler.onDlData(this, data, (err) => {
         if (err) {
-          this.#dldata.nack(msg);
+          self.#dldata.nack(msg, (_err) => {});
         } else {
-          this.#dldata.ack(msg);
+          self.#dldata.ack(msg, (_err) => {});
         }
       });
     } else if (queue.name() === this.#ctrl.name()) {
       data.time = new Date(data.time);
       this.#mgrMsgHandler.onCtrl(this, data, (err) => {
         if (err) {
-          this.#ctrl.nack(msg);
+          self.#ctrl.nack(msg, (_err) => {});
         } else {
-          this.#ctrl.ack(msg);
+          self.#ctrl.ack(msg, (_err) => {});
         }
       });
     } else {

@@ -2,8 +2,6 @@
 
 const assert = require('assert');
 
-const async = require('async');
-
 const { Client, ClientOptions } = require('../../api/http');
 
 const AUTH_BASE = 'http://localhost:1080/auth';
@@ -23,32 +21,22 @@ function testNew() {
 }
 
 function testNewWrong() {
-  assert.throws(() => {
-    new Client();
-  });
+  assert.throws(() => new Client());
   const opts = {
     authBase: 1,
   };
-  assert.throws(() => {
-    new Client(opts);
-  });
+  assert.throws(() => new Client(opts));
   opts.authBase = AUTH_BASE;
   opts.coremgrBase = '';
-  assert.throws(() => {
-    new Client(opts);
-  });
+  assert.throws(() => new Client(opts));
   opts.coremgrBase = COREMGR_BASE;
   opts.clientId = null;
-  assert.throws(() => {
-    new Client(opts);
-  });
+  assert.throws(() => new Client(opts));
   opts.clientId = CLIENT_ID;
-  assert.throws(() => {
-    new Client(opts);
-  });
+  assert.throws(() => new Client(opts));
 }
 
-function testReq(done) {
+async function testReq() {
   /** @type {ClientOptions} */
   const opts = {
     authBase: AUTH_BASE,
@@ -59,81 +47,52 @@ function testReq(done) {
   const client = new Client(opts);
   assert.ok(client);
 
-  client.request('GET', '/api/v1/user', (err, status, body) => {
-    if (err) {
-      return void done(err);
-    } else if (status !== 200) {
-      return void done(body || status);
-    }
+  let res = await client.request('GET', '/api/v1/user');
+  assert.strictEqual(res.status, 200, res.body ? JSON.stringify(res.body) : `${res.status}`);
 
-    // Request twice to use in memory token.
-    client.request('GET', '/api/v1/user', (err, status, body) => {
-      if (err) {
-        return void done(err);
-      } else if (status !== 200) {
-        return void done(body || status || {});
-      }
-      done(null);
-    });
-  });
+  // Request twice to use in memory token.
+  res = await client.request('GET', '/api/v1/user');
+  assert.strictEqual(res.status, 200, res.body ? JSON.stringify(res.body) : `${res.status}`);
 }
 
-function testReqErr(done) {
+async function testReqErr() {
   /** @type {ClientOptions} */
-  const opts = {
+  let opts = {
     authBase: AUTH_BASE,
     coremgrBase: COREMGR_BASE,
     clientId: CLIENT_ID,
     clientSecret: CLIENT_SECRET,
   };
-  const client = new Client(opts);
+  let client = new Client(opts);
   assert.ok(client);
 
-  assert.throws(() => {
-    client.request('');
-  });
-  assert.throws(() => {
-    client.request('GET', '');
-  });
-  assert.throws(() => {
-    client.request('GET', '/api', {});
-  });
-  assert.throws(() => {
-    client.request('GET', '/api', {}, {});
-  });
-  assert.throws(() => {
-    client.request('GET', '/api', null, () => {});
-  });
+  const shouldErrFn = (res) => {
+    throw Error(`should error, res: ${JSON.stringify(res)}`);
+  };
+  const catchFn = (err) => assert.ok(!(err instanceof SdkError));
 
-  async.waterfall(
-    [
-      function (cb) {
-        const opts = {
-          authBase: 'http://localhost:1234',
-          coremgrBase: COREMGR_BASE,
-          clientId: CLIENT_ID,
-          clientSecret: CLIENT_SECRET,
-        };
-        const client = new Client(opts);
-        client.request('GET', '/api', (err) => {
-          cb(err ? null : 'wrong authBase should error');
-        });
-      },
-      function (cb) {
-        const opts = {
-          authBase: AUTH_BASE,
-          coremgrBase: 'http://localhost:1234',
-          clientId: CLIENT_ID,
-          clientSecret: CLIENT_SECRET,
-        };
-        const client = new Client(opts);
-        client.request('GET', '/api', (err) => {
-          cb(err ? null : 'wrong coremgrBase should error');
-        });
-      },
-    ],
-    done
-  );
+  client.request('').then(shouldErrFn).catch(catchFn);
+  client.request('GET', '').then(shouldErrFn).catch(catchFn);
+  client.request('GET', '/api').then(shouldErrFn).catch(catchFn);
+  client.request('GET', '/api', null).then(shouldErrFn).catch(catchFn);
+
+  opts = {
+    authBase: 'http://localhost:1234',
+    coremgrBase: COREMGR_BASE,
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+  };
+  client = new Client(opts);
+  client.request('GET', '/api').then(shouldErrFn).catch(catchFn);
+
+  opts = {
+    authBase: AUTH_BASE,
+    coremgrBase: 'http://localhost:1234',
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+  };
+  client = new Client(opts);
+  client.request('GET', '/api').then(shouldErrFn).catch(catchFn);
 }
 
 module.exports = {

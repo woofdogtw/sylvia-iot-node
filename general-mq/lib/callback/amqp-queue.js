@@ -2,11 +2,11 @@
 
 const { EventEmitter } = require('events');
 
-const amqplib = require('amqplib');
+const amqplib = require('amqplib/callback_api');
+const async = require('async');
 
 const { AmqpConnection } = require('./amqp-connection');
-const { DataTypes, Errors, Events, QueuePattern, Status } = require('./constants');
-const { SdkError } = require('./lib');
+const { DataTypes, Errors, Events, QueuePattern, Status } = require('./../constants');
 
 const DEF_RECONN = 1000;
 
@@ -180,115 +180,124 @@ class AmqpQueue extends EventEmitter {
   }
 
   /**
-   * To close the queue. You can use `await` to get the result or listen events.
+   * To close the queue. You can use a callback function to get the result or listen events.
    *
-   * @async
-   * @returns {Promise<void>}
-   * @throws {SdkError}
+   * @param {function} [callback]
+   *   @param {?Error} callback.err
    */
-  async close() {
+  close(callback) {
+    if (typeof callback !== DataTypes.Function) {
+      callback = null;
+    }
+
     if (this.#status === Status.Closing || this.#status === Status.Closed) {
+      if (callback) {
+        return void process.nextTick(() => callback(null));
+      }
       return;
     } else if (!this.#channel) {
       this.#status = Status.Closed;
       this.emit(Events.Status, Status.Closed);
-      return;
+      if (callback) {
+        return void process.nextTick(() => callback(null));
+      }
     }
 
     this.#status = Status.Closing;
     this.emit(Events.Status, Status.Closing);
 
-    let err;
-    await this.#channel.close().catch((e) => (err = e));
-    if (this.#channel) {
-      this.#channel.removeAllListeners();
-      this.#channel = null;
-    }
-    this.#status = Status.Closed;
-    this.emit(Events.Status, Status.Closed);
-    if (err) {
-      throw new SdkError(err.message);
-    }
+    this.#channel.close((err) => {
+      if (this.#channel) {
+        this.#channel.removeAllListeners();
+        this.#channel = null;
+      }
+      this.#status = Status.Closed;
+      this.emit(Events.Status, Status.Closed);
+      if (callback) {
+        return void process.nextTick(() => callback(err));
+      }
+    });
   }
 
   /**
    * To send a message (for senders only).
    *
-   * @async
    * @param {Buffer} payload The raw data to be sent.
-   * @returns {Promise<void>}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    * @throws {Error} Wrong arguments.
-   * @throws {SdkError}
    */
-  async sendMsg(payload) {
+  sendMsg(payload, callback) {
     if (!(payload instanceof Buffer)) {
       throw Error('`payload` is not a Buffer');
+    } else if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
     } else if (this.#status !== Status.Connected) {
-      throw new SdkError(Errors.NotConnected);
+      return void process.nextTick(() => callback(Error(Errors.NotConnected)));
     } else if (this.#opts.isRecv) {
-      throw new SdkError(Errors.QueueIsReceiver);
+      return void process.nextTick(() => callback(Error(Errors.QueueIsReceiver)));
     }
 
     const exchange = this.#opts.broadcast ? this.#opts.name : '';
     const routingKey = this.#opts.broadcast ? '' : this.#opts.name;
     if (this.#opts.reliable) {
-      await new Promise((resolve, reject) => {
-        this.#channel.publish(exchange, routingKey, payload, { mandatory: true }, (err) => {
-          if (err) {
-            return reject(new SdkError(err.message));
-          }
-          resolve();
-        });
+      this.#channel.publish(exchange, routingKey, payload, { mandatory: true }, (err) => {
+        if (err) {
+          return void callback(err);
+        }
+        callback(null);
       });
     } else {
       this.#channel.publish(exchange, routingKey, payload, { persistent: this.#opts.persistent });
       // Use `setTimeout` instead of `nextTick` because nextTick may causes too much events to hang
       // AMQP packets transmission.
-      await new Promise((resolve) => setTimeout(resolve, 1));
+      setTimeout(() => callback(null), 1);
     }
   }
 
   /**
    * Use this if the message is processed successfully.
    *
-   * @async
    * @param {AmqpMessage} msg
-   * @returns {Promise<void>}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    * @throws {Error} Wrong usage.
-   * @throws {SdkError}
    */
-  async ack(msg) {
+  ack(msg, callback) {
     if (!msg || typeof msg !== DataTypes.Object || Array.isArray(msg)) {
       throw Error('`msg` is not an object');
+    } else if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
     }
 
     if (this.#channel) {
       this.#channel.ack(msg.meta);
-      await new Promise((resolve) => process.nextTick(resolve));
     }
+    process.nextTick(() => callback(null));
   }
 
   /**
    * To requeue the message and the broker will send the message in the future.
    *
-   * @async
    * @param {AmqpMessage} msg
-   * @returns {Promise<void>}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    * @throws {Error} Wrong usage.
-   * @throws {SdkError}
    */
-  async nack(msg) {
+  nack(msg, callback) {
     if (!msg || typeof msg !== DataTypes.Object || Array.isArray(msg)) {
       throw Error('`msg` is not an object');
+    } else if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
     }
 
     if (this.#channel) {
       this.#channel.nack(msg.meta);
-      await new Promise((resolve) => process.nextTick(resolve));
     }
+    process.nextTick(() => callback(null));
   }
 
-  async #innerConnect() {
+  #innerConnect() {
     if (this.#status !== Status.Connecting || this.#connProcessing) {
       return;
     }
@@ -304,46 +313,65 @@ class AmqpQueue extends EventEmitter {
       return void setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
     }
 
-    try {
-      // Create a channel.
-      const channel = this.#opts.reliable
-        ? await rawConn.createConfirmChannel()
-        : await rawConn.createChannel();
+    const self = this;
+    let channel;
+    async.waterfall(
+      [
+        // Create a channel.
+        function (cb) {
+          const fn = self.#opts.reliable
+            ? rawConn.createConfirmChannel.bind(rawConn)
+            : rawConn.createChannel.bind(rawConn);
+          fn((err, ch) => {
+            if (err) {
+              return void cb(err);
+            }
+            channel = ch;
+            cb(null);
+          });
+        },
+        // Declare resources for unicast or broadcast.
+        function (cb) {
+          if (self.#opts.broadcast) {
+            self.#createBroadcast(channel, (err, qname) => cb(err, qname));
+          } else {
+            self.#createUnicast(channel, (err) => cb(err, self.#opts.name));
+          }
+        },
+        // Set handlers before consuming to prevent `onMessage`.
+        function (qname, cb) {
+          channel.on('close', self.#onClose.bind(self));
+          channel.on('drain', self.#onDrain.bind(self));
+          channel.on('error', self.#onError.bind(self));
+          channel.on('return', self.#onReturn.bind(self));
+          self.#channel = channel;
+          cb(null, qname);
+        },
+        // Set prefetch and consume the incoming messages.
+        function (qname, cb) {
+          if (!self.#opts.isRecv) {
+            return void cb(null);
+          }
 
-      // Declare resources for unicast or broadcast.
-      let qname;
-      if (this.#opts.broadcast) {
-        qname = await this.#createBroadcast(channel);
-      } else {
-        await this.#createUnicast(channel);
-        qname = this.#opts.name;
+          channel.prefetch(self.#opts.prefetch);
+          channel.consume(qname, self.#innerOnMessage.bind(self), {}, (err) => cb(err));
+        },
+      ],
+      (err) => {
+        self.#connProcessing = false;
+        if (err) {
+          if (self.#channel) {
+            self.#channel.removeAllListeners();
+            self.#channel = null;
+          }
+          self.emit(Events.Error, err);
+          return void setTimeout(() => self.#innerConnect(), self.#opts.reconnectMillis);
+        }
+
+        self.#status = Status.Connected;
+        self.emit(Events.Status, Status.Connected);
       }
-
-      this.#connProcessing = false;
-
-      channel.on('close', this.#onClose.bind(this));
-      channel.on('drain', this.#onDrain.bind(this));
-      channel.on('error', this.#onError.bind(this));
-      channel.on('return', this.#onReturn.bind(this));
-      this.#channel = channel;
-
-      // Set prefetch and consume the incoming messages.
-      if (this.#opts.isRecv) {
-        await channel.prefetch(this.#opts.prefetch);
-        await channel.consume(qname, this.#innerOnMessage.bind(this), {});
-      }
-
-      this.#status = Status.Connected;
-      this.emit(Events.Status, Status.Connected);
-    } catch (err) {
-      if (this.#channel) {
-        this.#channel.removeAllListeners();
-        this.#channel = null;
-      }
-      this.#connProcessing = false;
-      this.emit(Events.Error, err);
-      return void setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
-    }
+    );
   }
 
   /**
@@ -364,41 +392,50 @@ class AmqpQueue extends EventEmitter {
   /**
    * To create resouces for the broadcast queue.
    *
-   * @async
    * @param {amqplib.Channel} channel
-   * @returns {Promise<string>} The name of the temporary queue.
-   * @throws {SdkError}
+   * @param {function} callback
+   *   @param {?Error} callback.err
+   *   @param {string} callback.qname The name of the temporary queue.
    */
-  async #createBroadcast(channel) {
-    try {
-      // Declare the fanout exchange.
-      await channel.assertExchange(this.#opts.name, amqplibConsts.Fanout, { durable: false });
+  #createBroadcast(channel, callback) {
+    const self = this;
 
-      // Declare a temporary queue and bind the queue name to the exchange.
-      if (!this.#opts.isRecv) {
-        return '';
+    async.waterfall(
+      [
+        // Declare the fanout exchange.
+        function (cb) {
+          const opts = { durable: false };
+          channel.assertExchange(self.#opts.name, amqplibConsts.Fanout, opts, (err) => cb(err));
+        },
+        // Declare a temporary queue and bind the queue name to the exchange.
+        function (cb) {
+          if (!self.#opts.isRecv) {
+            return void cb(null, '');
+          }
+
+          channel.assertQueue('', { exclusive: true }, (err, q) => {
+            if (err) {
+              return void cb(err);
+            }
+            channel.bindQueue(q.queue, self.#opts.name, '', {}, (err) => cb(err, q.name));
+          });
+        },
+      ],
+      (err, qname) => {
+        callback(err, qname);
       }
-
-      const q = await channel.assertQueue('', { exclusive: true });
-      await channel.bindQueue(q.name, this.#opts.name, '', {});
-      return q.name;
-    } catch (err) {
-      throw new SdkError(err.message);
-    }
+    );
   }
 
   /**
    * To create resouces for the unicast queue.
    *
-   * @async
    * @param {amqplib.Channel} channel
-   * @returns {Promise<void>}
-   * @throws {SdkError}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    */
-  async #createUnicast(channel) {
-    await channel.assertQueue(this.#opts.name, { durable: true }).catch((err) => {
-      throw new SdkError(err.message);
-    });
+  #createUnicast(channel, callback) {
+    channel.assertQueue(this.#opts.name, { durable: true }, (err) => callback(err));
   }
 
   /**
