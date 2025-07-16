@@ -23,9 +23,9 @@
   },
   "devDependencies": {
     "jsdoc": "^4.0.4",
-    "mocha": "11.7.1",
-    "nyc": "17.1.0",
-    "superagent": "10.2.2"
+    "mocha": "^11.7.1",
+    "nyc": "^17.1.0",
+    "superagent": "^10.2.2"
   },
   "scripts": {
     "badge": "genhtml ./coverage/lcov.info -o out; lcov_badge_generator -o coverage/badge.svg out/index.html",
