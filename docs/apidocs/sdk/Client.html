@@ -94,7 +94,7 @@ refresh token flow.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api_http.js.html">api/http.js</a>, <a href="api_http.js.html#line23">line 23</a>
+        <a href="api_http.js.html">api/http.js</a>, <a href="api_http.js.html#line34">line 34</a>
     </li></ul></dd>
     
 
@@ -150,7 +150,7 @@ refresh token flow.
     
 
     
-    <h4 class="name" id="request"><span class="type-signature"></span>request<span class="signature">(method, apiPath, body<span class="signature-attributes">opt</span>, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="request"><span class="type-signature">(async) </span>request<span class="signature">(method, apiPath, body<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#ClientResponse">ClientResponse</a>>}</span></h4>
     
 
     
@@ -290,163 +290,6 @@ refresh token flow.
         </tr>
 
     
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>err</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Error</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-                    &lt;nullable><br>
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>status</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>body</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-|
-
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
     </tbody>
 </table>
 
@@ -484,7 +327,7 @@ refresh token flow.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api_http.js.html">api/http.js</a>, <a href="api_http.js.html#line69">line 69</a>
+        <a href="api_http.js.html">api/http.js</a>, <a href="api_http.js.html#line79">line 79</a>
     </li></ul></dd>
     
 
@@ -508,8 +351,8 @@ refresh token flow.
 
 
 <h5>Throws:</h5>
-
-        
+<ul>
+        <li>
 
 <dl>
     <dt>
@@ -534,10 +377,41 @@ refresh token flow.
     <dd></dd>
 </dl>
 
+</li>
+    
+        <li>
+
+    <div class="param-desc">
+    
+        
+<span class="param-type">SdkError</span>
+
 
     
+    </div>
+
+</li>
+    </ul>
 
 
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="global.html#ClientResponse">ClientResponse</a>></span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -677,7 +551,7 @@ refresh token flow.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api_http.js.html">api/http.js</a>, <a href="api_http.js.html#line36">line 36</a>
+        <a href="api_http.js.html">api/http.js</a>, <a href="api_http.js.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -762,7 +636,7 @@ refresh token flow.
     
 
     
-    <h4 class="name" id="request"><span class="type-signature"></span>request<span class="signature">(method, apiPath, body<span class="signature-attributes">opt</span>, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="request"><span class="type-signature">(async) </span>request<span class="signature">(method, apiPath, body<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#ClientResponse">ClientResponse</a>>}</span></h4>
     
 
     
@@ -902,163 +776,6 @@ refresh token flow.
         </tr>
 
     
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>err</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Error</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-                    &lt;nullable><br>
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>status</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>body</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-|
-
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
     </tbody>
 </table>
 
@@ -1096,7 +813,7 @@ refresh token flow.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api_http.js.html">api/http.js</a>, <a href="api_http.js.html#line69">line 69</a>
+        <a href="api_http.js.html">api/http.js</a>, <a href="api_http.js.html#line79">line 79</a>
     </li></ul></dd>
     
 
@@ -1120,8 +837,8 @@ refresh token flow.
 
 
 <h5>Throws:</h5>
-
-        
+<ul>
+        <li>
 
 <dl>
     <dt>
@@ -1146,10 +863,41 @@ refresh token flow.
     <dd></dd>
 </dl>
 
+</li>
+    
+        <li>
+
+    <div class="param-desc">
+    
+        
+<span class="param-type">SdkError</span>
+
 
     
+    </div>
+
+</li>
+    </ul>
 
 
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="global.html#ClientResponse">ClientResponse</a>></span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -1171,13 +919,13 @@ refresh token flow.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ApplicationMgr.html">ApplicationMgr</a></li><li><a href="Client.html">Client</a></li><li><a href="Connection.html">Connection</a></li><li><a href="NetworkMgr.html">NetworkMgr</a></li></ul><h3>Events</h3><ul><li><a href="ApplicationMgr.html#event:status">status</a></li><li><a href="NetworkMgr.html#event:status">status</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CtrlOp">CtrlOp</a></li><li><a href="global.html#Errors">Errors</a></li><li><a href="global.html#MgrStatus">MgrStatus</a></li><li><a href="global.html#authMiddleware">authMiddleware</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#update">update</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ApplicationMgr.html">ApplicationMgr</a></li><li><a href="Client.html">Client</a></li><li><a href="Connection.html">Connection</a></li><li><a href="NetworkMgr.html">NetworkMgr</a></li></ul><h3>Events</h3><ul><li><a href="ApplicationMgr.html#event:status">status</a></li><li><a href="NetworkMgr.html#event:status">status</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CtrlOp">CtrlOp</a></li><li><a href="global.html#ErrorCode">ErrorCode</a></li><li><a href="global.html#Errors">Errors</a></li><li><a href="global.html#MgrStatus">MgrStatus</a></li><li><a href="global.html#authMiddleware">authMiddleware</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#removeConnection">removeConnection</a></li><li><a href="global.html#update">update</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Jun 30 2025 11:38:40 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Jul 16 2025 14:48:59 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: constants.js</title>
+    <title>JSDoc: Source: lib.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: constants.js</h1>
+    <h1 class="page-title">Source: lib.js</h1>
 
     
 
@@ -28,59 +28,18 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
+/**
+ * The general purposed error type for SDK errors.
+ */
+class SdkError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'SdkError';
+  }
+}
+
 module.exports = {
-  /**
-   * Data types.
-   *
-   * @name DataTypes
-   * @readonly
-   * @enum {Symbol}
-   */
-  DataTypes: {
-    /** @memberof DataTypes */
-    Boolean: 'boolean',
-    Function: 'function',
-    Object: 'object',
-    String: 'string',
-  },
-  /**
-   * Errors.
-   *
-   * @name Errors
-   * @readonly
-   * @enum {string}
-   */
-  Errors: {
-    NoMsgHandler: 'no message handler',
-    NotConnected: 'not connected',
-    QueueIsReceiver: 'this queue is a receiver',
-  },
-  /**
-   * Events.
-   *
-   * @name Events
-   * @readonly
-   * @enum {string}
-   */
-  Events: {
-    Error: 'error',
-    Status: 'status',
-  },
-  QueuePattern: /^[a-z0-9_-]+([\.]{1}[a-z0-9_-]+)*$/,
-  /**
-   * Connection/Queue status.
-   *
-   * @name Status
-   * @readonly
-   * @enum {Symbol}
-   */
-  Status: {
-    Closing: Symbol(),
-    Closed: Symbol(),
-    Connecting: Symbol(),
-    Connected: Symbol(),
-    Disconnected: Symbol(),
-  },
+  SdkError,
 };
 </code></pre>
         </article>

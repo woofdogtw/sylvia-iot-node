@@ -93,7 +93,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line39">line 39</a>
+        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line40">line 40</a>
     </li></ul></dd>
     
 
@@ -156,7 +156,7 @@
     
 
     
-    <h4 class="name" id="close"><span class="type-signature"></span>close<span class="signature">(callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="close"><span class="type-signature">(async) </span>close<span class="signature">()</span><span class="type-signature"> &rarr; {Promise.&lt;void>}</span></h4>
     
 
     
@@ -164,7 +164,7 @@
 
 
 <div class="description">
-    To close the connection. You can use a callback function to get the result or listen events.
+    To close the connection. You can use `await` to get the result or listen events.
 </div>
 
 
@@ -173,128 +173,6 @@
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>err</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Error</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-                    &lt;nullable><br>
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -330,7 +208,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line149">line 149</a>
+        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line151">line 151</a>
     </li></ul></dd>
     
 
@@ -353,8 +231,41 @@
 
 
 
+<h5>Throws:</h5>
+
+        
+
+    <div class="param-desc">
+    
+        
+<span class="param-type"><a href="SdkError.html">SdkError</a></span>
 
 
+    
+    </div>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;void></span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -418,7 +329,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line132">line 132</a>
+        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line133">line 133</a>
     </li></ul></dd>
     
 
@@ -506,7 +417,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line125">line 125</a>
+        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line126">line 126</a>
     </li></ul></dd>
     
 
@@ -630,7 +541,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line15">line 15</a>
+        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line16">line 16</a>
     </li></ul></dd>
     
 
@@ -728,7 +639,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line22">line 22</a>
+        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -1160,7 +1071,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line60">line 60</a>
+        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line61">line 61</a>
     </li></ul></dd>
     
 
@@ -1245,7 +1156,7 @@
     
 
     
-    <h4 class="name" id="close"><span class="type-signature"></span>close<span class="signature">(callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="close"><span class="type-signature">(async) </span>close<span class="signature">()</span><span class="type-signature"> &rarr; {Promise.&lt;void>}</span></h4>
     
 
     
@@ -1253,7 +1164,7 @@
 
 
 <div class="description">
-    To close the connection. You can use a callback function to get the result or listen events.
+    To close the connection. You can use `await` to get the result or listen events.
 </div>
 
 
@@ -1262,128 +1173,6 @@
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>err</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Error</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-                    &lt;nullable><br>
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -1419,7 +1208,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line149">line 149</a>
+        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line151">line 151</a>
     </li></ul></dd>
     
 
@@ -1442,8 +1231,41 @@
 
 
 
+<h5>Throws:</h5>
+
+        
+
+    <div class="param-desc">
+    
+        
+<span class="param-type"><a href="SdkError.html">SdkError</a></span>
 
 
+    
+    </div>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;void></span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -1507,7 +1329,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line132">line 132</a>
+        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line133">line 133</a>
     </li></ul></dd>
     
 
@@ -1595,7 +1417,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line125">line 125</a>
+        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line126">line 126</a>
     </li></ul></dd>
     
 
@@ -1719,7 +1541,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line15">line 15</a>
+        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line16">line 16</a>
     </li></ul></dd>
     
 
@@ -1817,7 +1639,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line22">line 22</a>
+        <a href="mqtt-connection.js.html">mqtt-connection.js</a>, <a href="mqtt-connection.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -1859,13 +1681,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AmqpConnection.html">AmqpConnection</a></li><li><a href="AmqpQueue.html">AmqpQueue</a></li><li><a href="MqttConnection.html">MqttConnection</a></li><li><a href="MqttQueue.html">MqttQueue</a></li></ul><h3>Events</h3><ul><li><a href="AmqpConnection.html#event:error">error</a></li><li><a href="AmqpConnection.html#event:status">status</a></li><li><a href="AmqpQueue.html#event:error">error</a></li><li><a href="AmqpQueue.html#event:status">status</a></li><li><a href="MqttConnection.html#event:error">error</a></li><li><a href="MqttConnection.html#event:status">status</a></li><li><a href="MqttQueue.html#event:error">error</a></li><li><a href="MqttQueue.html#event:status">status</a></li></ul><h3>Global</h3><ul><li><a href="global.html#DataTypes">DataTypes</a></li><li><a href="global.html#Errors">Errors</a></li><li><a href="global.html#Events">Events</a></li><li><a href="global.html#Status">Status</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AmqpConnection.html">AmqpConnection</a></li><li><a href="AmqpQueue.html">AmqpQueue</a></li><li><a href="MqttConnection.html">MqttConnection</a></li><li><a href="MqttQueue.html">MqttQueue</a></li><li><a href="SdkError.html">SdkError</a></li></ul><h3>Events</h3><ul><li><a href="AmqpConnection.html#event:error">error</a></li><li><a href="AmqpConnection.html#event:status">status</a></li><li><a href="AmqpQueue.html#event:error">error</a></li><li><a href="AmqpQueue.html#event:status">status</a></li><li><a href="MqttConnection.html#event:error">error</a></li><li><a href="MqttConnection.html#event:status">status</a></li><li><a href="MqttQueue.html#event:error">error</a></li><li><a href="MqttQueue.html#event:status">status</a></li></ul><h3>Global</h3><ul><li><a href="global.html#DataTypes">DataTypes</a></li><li><a href="global.html#Errors">Errors</a></li><li><a href="global.html#Events">Events</a></li><li><a href="global.html#Status">Status</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Jun 30 2025 11:38:39 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Jul 16 2025 14:48:58 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

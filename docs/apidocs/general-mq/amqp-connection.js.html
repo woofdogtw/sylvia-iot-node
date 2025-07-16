@@ -31,9 +31,10 @@
 const { EventEmitter } = require('events');
 const { URL } = require('url');
 
-const amqplib = require('amqplib/callback_api');
+const amqplib = require('amqplib');
 
 const { DataTypes, Events, Status } = require('./constants');
+const { SdkError } = require('./lib');
 
 const DEF_URI = 'amqp://localhost';
 const DEF_CONN_TIMEOUT = 3000;
@@ -141,72 +142,60 @@ class AmqpConnection extends EventEmitter {
   }
 
   /**
-   * To close the connection. You can use a callback function to get the result or listen events.
+   * To close the connection. You can use `await` to get the result or listen events.
    *
-   * @param {function} [callback]
-   *   @param {?Error} callback.err
+   * @async
+   * @returns {Promise&lt;void>}
+   * @throws {SdkError}
    */
-  close(callback) {
-    if (typeof callback !== DataTypes.Function) {
-      callback = null;
-    }
-
-    if (!this.#conn) {
-      if (callback) {
-        return void process.nextTick(() => {
-          callback(null);
-        });
-      }
+  async close() {
+    if (!this.#conn || this.#status === Status.Closed || this.#status === Status.Closing) {
       return;
     }
 
     this.#status = Status.Closing;
     this.emit(Events.Status, Status.Closing);
-    const self = this;
-    this.#conn.close((err) => {
-      if (self.#conn) {
-        self.#conn.removeAllListeners();
-        self.#conn = null;
-      }
-      self.#status = Status.Closed;
-      self.emit(Events.Status, Status.Closed);
-      if (callback) {
-        return void process.nextTick(() => {
-          callback(err);
-        });
-      }
-    });
+
+    let err;
+    await this.#conn.close().catch((e) => (err = e));
+    if (this.#conn) {
+      this.#conn.removeAllListeners();
+      this.#conn = null;
+    }
+    this.#status = Status.Closed;
+    this.emit(Events.Status, Status.Closed);
+    if (err) {
+      throw new SdkError(err.message);
+    }
   }
 
   /**
    * To get the raw AMQP connection instance for channel declaration.
    *
    * @private
-   * @returns {?amqplib.Connection} The connection instance.
+   * @returns {?amqplib.ChannelModel} The connection instance.
    */
   getRawConnection() {
     return this.#conn;
   }
 
-  #innerConnect() {
-    let self = this;
+  async #innerConnect() {
     const opts = {};
     if (this.#opts.insecure) {
       opts.rejectUnauthorized = false;
     }
-    amqplib.connect(this.#opts.uri, opts, (err, conn) => {
-      if (err) {
-        return void setTimeout(() => {
-          self.#innerConnect();
-        }, self.#opts.reconnectMillis);
-      }
 
-      conn.on('close', self.#onClose.bind(self));
-      conn.on('error', self.#onError.bind(self));
-      self.#conn = conn;
-      self.#status = Status.Connected;
-      self.emit(Events.Status, Status.Connected);
-    });
+    try {
+      const conn = await amqplib.connect(this.#opts.uri, opts);
+
+      conn.on('close', this.#onClose.bind(this));
+      conn.on('error', this.#onError.bind(this));
+      this.#conn = conn;
+      this.#status = Status.Connected;
+      this.emit(Events.Status, Status.Connected);
+    } catch (_e) {
+      return void setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
+    }
   }
 
   #onClose() {
@@ -231,7 +220,7 @@ class AmqpConnection extends EventEmitter {
   #opts;
   /** @type {Status} */
   #status;
-  /** @type {amqplib.Connection} */
+  /** @type {amqplib.ChannelModel} */
   #conn;
 }
 
@@ -248,13 +237,13 @@ module.exports = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AmqpConnection.html">AmqpConnection</a></li><li><a href="AmqpQueue.html">AmqpQueue</a></li><li><a href="MqttConnection.html">MqttConnection</a></li><li><a href="MqttQueue.html">MqttQueue</a></li></ul><h3>Events</h3><ul><li><a href="AmqpConnection.html#event:error">error</a></li><li><a href="AmqpConnection.html#event:status">status</a></li><li><a href="AmqpQueue.html#event:error">error</a></li><li><a href="AmqpQueue.html#event:status">status</a></li><li><a href="MqttConnection.html#event:error">error</a></li><li><a href="MqttConnection.html#event:status">status</a></li><li><a href="MqttQueue.html#event:error">error</a></li><li><a href="MqttQueue.html#event:status">status</a></li></ul><h3>Global</h3><ul><li><a href="global.html#DataTypes">DataTypes</a></li><li><a href="global.html#Errors">Errors</a></li><li><a href="global.html#Events">Events</a></li><li><a href="global.html#Status">Status</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AmqpConnection.html">AmqpConnection</a></li><li><a href="AmqpQueue.html">AmqpQueue</a></li><li><a href="MqttConnection.html">MqttConnection</a></li><li><a href="MqttQueue.html">MqttQueue</a></li><li><a href="SdkError.html">SdkError</a></li></ul><h3>Events</h3><ul><li><a href="AmqpConnection.html#event:error">error</a></li><li><a href="AmqpConnection.html#event:status">status</a></li><li><a href="AmqpQueue.html#event:error">error</a></li><li><a href="AmqpQueue.html#event:status">status</a></li><li><a href="MqttConnection.html#event:error">error</a></li><li><a href="MqttConnection.html#event:status">status</a></li><li><a href="MqttQueue.html#event:error">error</a></li><li><a href="MqttQueue.html#event:status">status</a></li></ul><h3>Global</h3><ul><li><a href="global.html#DataTypes">DataTypes</a></li><li><a href="global.html#Errors">Errors</a></li><li><a href="global.html#Events">Events</a></li><li><a href="global.html#Status">Status</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Jun 30 2025 11:38:39 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Jul 16 2025 14:48:58 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

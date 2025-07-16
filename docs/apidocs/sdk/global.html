@@ -170,6 +170,78 @@
 
         
             
+<h4 class="name" id="ErrorCode"><span class="type-signature">(readonly) </span>ErrorCode<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    Error code.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api_constants.js.html">api/constants.js</a>, <a href="api_constants.js.html#line4">line 4</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
 <h4 class="name" id="Errors"><span class="type-signature">(readonly) </span>Errors<span class="type-signature"> :string</span></h4>
 
 
@@ -484,7 +556,7 @@
     
 
     
-    <h4 class="name" id="get"><span class="type-signature"></span>get<span class="signature">(client, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="get"><span class="type-signature">(async) </span>get<span class="signature">(client, callback)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#GetResData">GetResData</a>>}</span></h4>
     
 
     
@@ -567,99 +639,7 @@
 
             
 
-            <td class="description last">
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>err</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Error</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-                    &lt;nullable><br>
-                
-
-                
-                </td>
-            
-
-            
-
             <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#GetResData">GetResData</a></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
         </tr>
 
     
@@ -700,7 +680,250 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api_user.js.html">api/user.js</a>, <a href="api_user.js.html#line35">line 35</a>
+        <a href="api_user.js.html">api/user.js</a>, <a href="api_user.js.html#line38">line 38</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        Wrong arguments.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+    <div class="param-desc">
+    
+        
+<span class="param-type">SdkError</span>
+
+
+    
+    </div>
+
+</li>
+    </ul>
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;<a href="global.html#GetResData">GetResData</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="removeConnection"><span class="type-signature">(async) </span>removeConnection<span class="signature">(connPool, hostUri, count)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Utility function to remove connection from the pool if the reference count meet zero.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>connPool</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Map.&lt;string, <a href="Connection.html">Connection</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>hostUri</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>count</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line157">line 157</a>
     </li></ul></dd>
     
 
@@ -727,28 +950,14 @@
 
         
 
-<dl>
-    <dt>
-        <div class="param-desc">
-        Wrong arguments.
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl>
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
+    <div class="param-desc">
+    
+        
+<span class="param-type">SdkError</span>
 
 
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
+    
+    </div>
 
 
     
@@ -765,7 +974,7 @@
     
 
     
-    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">(client, data, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="update"><span class="type-signature">(async) </span>update<span class="signature">(client, data)</span><span class="type-signature"></span></h4>
     
 
     
@@ -852,90 +1061,6 @@
         </tr>
 
     
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>err</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Error</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-                    &lt;nullable><br>
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
     </tbody>
 </table>
 
@@ -973,7 +1098,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api_user.js.html">api/user.js</a>, <a href="api_user.js.html#line67">line 67</a>
+        <a href="api_user.js.html">api/user.js</a>, <a href="api_user.js.html#line65">line 65</a>
     </li></ul></dd>
     
 
@@ -997,8 +1122,8 @@
 
 
 <h5>Throws:</h5>
-
-        
+<ul>
+        <li>
 
 <dl>
     <dt>
@@ -1023,8 +1148,21 @@
     <dd></dd>
 </dl>
 
+</li>
+    
+        <li>
+
+    <div class="param-desc">
+    
+        
+<span class="param-type">SdkError</span>
+
 
     
+    </div>
+
+</li>
+    </ul>
 
 
 
@@ -1307,7 +1445,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line37">line 37</a>
+        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line35">line 35</a>
     </li></ul></dd>
     
 
@@ -1532,7 +1670,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line49">line 49</a>
+        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -1724,7 +1862,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line59">line 59</a>
+        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line57">line 57</a>
     </li></ul></dd>
     
 
@@ -1890,7 +2028,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line75">line 75</a>
+        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line73">line 73</a>
     </li></ul></dd>
     
 
@@ -2285,7 +2423,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line21">line 21</a>
+        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line19">line 19</a>
     </li></ul></dd>
     
 
@@ -2480,7 +2618,157 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api_http.js.html">api/http.js</a>, <a href="api_http.js.html#line11">line 11</a>
+        <a href="api_http.js.html">api/http.js</a>, <a href="api_http.js.html#line14">line 14</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="ClientResponse">ClientResponse</h4>
+
+
+
+
+<div class="description">
+    Client response.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>status</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Status code.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Body.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api_http.js.html">api/http.js</a>, <a href="api_http.js.html#line26">line 26</a>
     </li></ul></dd>
     
 
@@ -2600,7 +2888,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line40">line 40</a>
+        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line37">line 37</a>
     </li></ul></dd>
     
 
@@ -2720,7 +3008,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line45">line 45</a>
+        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line42">line 42</a>
     </li></ul></dd>
     
 
@@ -2863,7 +3151,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line50">line 50</a>
+        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -2983,7 +3271,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line56">line 56</a>
+        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line53">line 53</a>
     </li></ul></dd>
     
 
@@ -3103,7 +3391,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line61">line 61</a>
+        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line58">line 58</a>
     </li></ul></dd>
     
 
@@ -3246,7 +3534,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line66">line 66</a>
+        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line63">line 63</a>
     </li></ul></dd>
     
 
@@ -3462,7 +3750,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line14">line 14</a>
+        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line11">line 11</a>
     </li></ul></dd>
     
 
@@ -4103,7 +4391,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api_user.js.html">api/user.js</a>, <a href="api_user.js.html#line7">line 7</a>
+        <a href="api_user.js.html">api/user.js</a>, <a href="api_user.js.html#line9">line 9</a>
     </li></ul></dd>
     
 
@@ -4288,7 +4576,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line58">line 58</a>
+        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line56">line 56</a>
     </li></ul></dd>
     
 
@@ -4567,7 +4855,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line37">line 37</a>
+        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line35">line 35</a>
     </li></ul></dd>
     
 
@@ -4759,7 +5047,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line49">line 49</a>
+        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -4902,7 +5190,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line74">line 74</a>
+        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line72">line 72</a>
     </li></ul></dd>
     
 
@@ -5123,7 +5411,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line27">line 27</a>
+        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line25">line 25</a>
     </li></ul></dd>
     
 
@@ -5349,7 +5637,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line90">line 90</a>
+        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line88">line 88</a>
     </li></ul></dd>
     
 
@@ -5589,7 +5877,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line98">line 98</a>
+        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line96">line 96</a>
     </li></ul></dd>
     
 
@@ -5829,7 +6117,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line82">line 82</a>
+        <a href="mq_application.js.html">mq/application.js</a>, <a href="mq_application.js.html#line80">line 80</a>
     </li></ul></dd>
     
 
@@ -6069,7 +6357,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line88">line 88</a>
+        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line86">line 86</a>
     </li></ul></dd>
     
 
@@ -6309,7 +6597,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line80">line 80</a>
+        <a href="mq_network.js.html">mq/network.js</a>, <a href="mq_network.js.html#line78">line 78</a>
     </li></ul></dd>
     
 
@@ -6675,7 +6963,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line25">line 25</a>
+        <a href="mq_lib.js.html">mq/lib.js</a>, <a href="mq_lib.js.html#line22">line 22</a>
     </li></ul></dd>
     
 
@@ -6867,7 +7155,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api_user.js.html">api/user.js</a>, <a href="api_user.js.html#line19">line 19</a>
+        <a href="api_user.js.html">api/user.js</a>, <a href="api_user.js.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -6897,13 +7185,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ApplicationMgr.html">ApplicationMgr</a></li><li><a href="Client.html">Client</a></li><li><a href="Connection.html">Connection</a></li><li><a href="NetworkMgr.html">NetworkMgr</a></li></ul><h3>Events</h3><ul><li><a href="ApplicationMgr.html#event:status">status</a></li><li><a href="NetworkMgr.html#event:status">status</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CtrlOp">CtrlOp</a></li><li><a href="global.html#Errors">Errors</a></li><li><a href="global.html#MgrStatus">MgrStatus</a></li><li><a href="global.html#authMiddleware">authMiddleware</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#update">update</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ApplicationMgr.html">ApplicationMgr</a></li><li><a href="Client.html">Client</a></li><li><a href="Connection.html">Connection</a></li><li><a href="NetworkMgr.html">NetworkMgr</a></li></ul><h3>Events</h3><ul><li><a href="ApplicationMgr.html#event:status">status</a></li><li><a href="NetworkMgr.html#event:status">status</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CtrlOp">CtrlOp</a></li><li><a href="global.html#ErrorCode">ErrorCode</a></li><li><a href="global.html#Errors">Errors</a></li><li><a href="global.html#MgrStatus">MgrStatus</a></li><li><a href="global.html#authMiddleware">authMiddleware</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#removeConnection">removeConnection</a></li><li><a href="global.html#update">update</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Jun 30 2025 11:38:40 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Jul 16 2025 14:48:59 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

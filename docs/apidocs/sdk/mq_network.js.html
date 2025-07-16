@@ -31,11 +31,9 @@
 const { EventEmitter } = require('events');
 const { URL } = require('url');
 
-const async = require('async');
-
-const { AmqpQueue } = require('general-mq/lib/amqp-queue');
-const { DataTypes, Status, Events } = require('general-mq/lib/constants');
-const { MqttQueue } = require('general-mq/lib/mqtt-queue');
+const gmq = require('general-mq');
+const { AmqpQueue, MqttQueue, SdkError } = gmq;
+const { DataTypes, Status, Events } = gmq.constants;
 const {
   Connection,
   DataMqStatus,
@@ -238,57 +236,30 @@ class NetworkMgr extends EventEmitter {
    * To close the manager queues.
    * The underlying connection will be closed when there are no queues use it.
    *
-   * @param {function} callback
-   *   @param {?Error} callback.err
+   * @async
+   * @throws {SdkError}
    */
-  close(callback) {
-    const self = this;
-
-    async.waterfall(
-      [
-        function (cb) {
-          self.#uldata.removeAllListeners();
-          self.#uldata.close((err) => {
-            cb(err || null);
-          });
-        },
-        function (cb) {
-          self.#dldata.removeAllListeners();
-          self.#dldata.close((err) => {
-            cb(err || null);
-          });
-        },
-        function (cb) {
-          self.#dldataResult.removeAllListeners();
-          self.#dldataResult.close((err) => {
-            cb(err || null);
-          });
-        },
-        function (cb) {
-          self.#ctrl.removeAllListeners();
-          self.#ctrl.close((err) => {
-            cb(err || null);
-          });
-        },
-        function (cb) {
-          removeConnection(self.#connPool, self.#hostUri, 4, (err) => {
-            cb(err || null);
-          });
-        },
-      ],
-      callback
-    );
+  async close() {
+    this.#uldata.removeAllListeners();
+    await this.#uldata.close();
+    this.#dldata.removeAllListeners();
+    await this.#dldata.close();
+    this.#dldataResult.removeAllListeners();
+    await this.#dldataResult.close();
+    this.#ctrl.removeAllListeners();
+    await this.#ctrl.close();
+    await removeConnection(this.#connPool, this.#hostUri, 4);
   }
 
   /**
    * Send uplink data to the broker.
    *
+   * @async
    * @param {NetUlData} data
-   * @param {function} callback
-   *   @param {?Error} callback.err
    * @throws {Error} Wrong arguments.
+   * @throws {SdkError}
    */
-  sendUlData(data, callback) {
+  async sendUlData(data) {
     if (!data || typeof data !== DataTypes.Object || Array.isArray(data)) {
       throw Error('`data` is not an object');
     } else if (!data.time || !(data.time instanceof Date) || isNaN(data.time.getTime())) {
@@ -313,20 +284,18 @@ class NetworkMgr extends EventEmitter {
       extension: data.extension || undefined,
     };
     const payload = Buffer.from(JSON.stringify(uldata));
-    this.#uldata.sendMsg(payload, (err) => {
-      callback(err || null);
-    });
+    await this.#uldata.sendMsg(payload);
   }
 
   /**
    * Send downlink result data to the broker.
    *
+   * @async
    * @param {NetDlDataResult} data
-   * @param {function} callback
-   *   @param {?Error} callback.err
    * @throws {Error} Wrong arguments.
+   * @throws {SdkError}
    */
-  sendDlDataResult(data, callback) {
+  async sendDlDataResult(data) {
     if (!data || typeof data !== DataTypes.Object || Array.isArray(data)) {
       throw Error('`data` is not an object');
     } else if (!data.dataId || typeof data.dataId !== DataTypes.String) {
@@ -343,9 +312,7 @@ class NetworkMgr extends EventEmitter {
       message: data.message || undefined,
     };
     const payload = Buffer.from(JSON.stringify(dldataResult));
-    this.#dldataResult.sendMsg(payload, (err) => {
-      callback(err || null);
-    });
+    await this.#dldataResult.sendMsg(payload);
   }
 
   /**
@@ -379,28 +346,27 @@ class NetworkMgr extends EventEmitter {
     try {
       data = JSON.parse(msg.payload.toString());
     } catch (e) {
-      queue.ack(msg, (_err) => {});
+      queue.ack(msg);
       return;
     }
 
-    const self = this;
     if (queue.name() === this.#dldata.name()) {
       data.pub = new Date(data.pub);
       data.data = Buffer.from(data.data, 'hex');
       this.#mgrMsgHandler.onDlData(this, data, (err) => {
         if (err) {
-          self.#dldata.nack(msg, (_err) => {});
+          this.#dldata.nack(msg);
         } else {
-          self.#dldata.ack(msg, (_err) => {});
+          this.#dldata.ack(msg);
         }
       });
     } else if (queue.name() === this.#ctrl.name()) {
       data.time = new Date(data.time);
       this.#mgrMsgHandler.onCtrl(this, data, (err) => {
         if (err) {
-          self.#ctrl.nack(msg, (_err) => {});
+          this.#ctrl.nack(msg);
         } else {
-          self.#ctrl.ack(msg, (_err) => {});
+          this.#ctrl.ack(msg);
         }
       });
     } else {
@@ -451,13 +417,13 @@ module.exports = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ApplicationMgr.html">ApplicationMgr</a></li><li><a href="Client.html">Client</a></li><li><a href="Connection.html">Connection</a></li><li><a href="NetworkMgr.html">NetworkMgr</a></li></ul><h3>Events</h3><ul><li><a href="ApplicationMgr.html#event:status">status</a></li><li><a href="NetworkMgr.html#event:status">status</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CtrlOp">CtrlOp</a></li><li><a href="global.html#Errors">Errors</a></li><li><a href="global.html#MgrStatus">MgrStatus</a></li><li><a href="global.html#authMiddleware">authMiddleware</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#update">update</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="ApplicationMgr.html">ApplicationMgr</a></li><li><a href="Client.html">Client</a></li><li><a href="Connection.html">Connection</a></li><li><a href="NetworkMgr.html">NetworkMgr</a></li></ul><h3>Events</h3><ul><li><a href="ApplicationMgr.html#event:status">status</a></li><li><a href="NetworkMgr.html#event:status">status</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CtrlOp">CtrlOp</a></li><li><a href="global.html#ErrorCode">ErrorCode</a></li><li><a href="global.html#Errors">Errors</a></li><li><a href="global.html#MgrStatus">MgrStatus</a></li><li><a href="global.html#authMiddleware">authMiddleware</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#removeConnection">removeConnection</a></li><li><a href="global.html#update">update</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Jun 30 2025 11:38:40 GMT+0000 (Coordinated Universal Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Jul 16 2025 14:48:59 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>
