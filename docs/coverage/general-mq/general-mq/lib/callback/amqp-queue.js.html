@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for general-mq/lib/amqp-queue.js</title>
+    <title>Code coverage report for general-mq/lib/callback/amqp-queue.js</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../prettify.css" />
-    <link rel="stylesheet" href="../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../sort-arrow-sprite.png);
+            background-image: url(../../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">general-mq/lib</a> amqp-queue.js</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">general-mq/lib/callback</a> amqp-queue.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">86.53% </span>
+                <span class="strong">90.27% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>135/156</span>
+                <span class='fraction'>167/185</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.17% </span>
+                <span class="strong">88.72% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>106/115</span>
+                <span class='fraction'>118/133</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80.95% </span>
+                <span class="strong">92.5% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>17/21</span>
+                <span class='fraction'>37/40</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.83% </span>
+                <span class="strong">91.01% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>130/148</span>
+                <span class='fraction'>152/167</span>
             </div>
         
             
@@ -530,13 +530,50 @@
 <a name='L465'></a><a href='#L465'>465</a>
 <a name='L466'></a><a href='#L466'>466</a>
 <a name='L467'></a><a href='#L467'>467</a>
-<a name='L468'></a><a href='#L468'>468</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a>
+<a name='L474'></a><a href='#L474'>474</a>
+<a name='L475'></a><a href='#L475'>475</a>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a>
+<a name='L480'></a><a href='#L480'>480</a>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a>
+<a name='L497'></a><a href='#L497'>497</a>
+<a name='L498'></a><a href='#L498'>498</a>
+<a name='L499'></a><a href='#L499'>499</a>
+<a name='L500'></a><a href='#L500'>500</a>
+<a name='L501'></a><a href='#L501'>501</a>
+<a name='L502'></a><a href='#L502'>502</a>
+<a name='L503'></a><a href='#L503'>503</a>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -674,7 +711,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">84x</span>
+<span class="cline-any cline-yes">78x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -718,28 +755,35 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">33x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">30x</span>
-<span class="cline-any cline-yes">30x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">30x</span>
 <span class="cline-any cline-yes">30x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">30x</span>
 <span class="cline-any cline-yes">30x</span>
 <span class="cline-any cline-yes">30x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">29x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -756,7 +800,9 @@
 <span class="cline-any cline-yes">23x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">22x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -766,18 +812,15 @@
 <span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -792,32 +835,35 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">24x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">24x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">22x</span>
-<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-yes">23x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -842,17 +888,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">31x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-yes">23x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">31x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">31x</span>
 <span class="cline-any cline-yes">31x</span>
 <span class="cline-any cline-yes">31x</span>
@@ -860,21 +917,29 @@
 <span class="cline-any cline-yes">31x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">31x</span>
 <span class="cline-any cline-yes">31x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -884,9 +949,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">45x</span>
-<span class="cline-any cline-yes">45x</span>
-<span class="cline-any cline-yes">45x</span>
+<span class="cline-any cline-yes">53x</span>
+<span class="cline-any cline-yes">53x</span>
+<span class="cline-any cline-yes">53x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -907,15 +972,26 @@
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -929,8 +1005,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">23x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -954,17 +1028,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">114x</span>
-<span class="cline-any cline-yes">31x</span>
-<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">84x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">114x</span>
+<span class="cline-any cline-yes">84x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">113x</span>
+<span class="cline-any cline-yes">83x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1001,11 +1075,11 @@
 &nbsp;
 const { EventEmitter } = require('events');
 &nbsp;
-const amqplib = require('amqplib');
+const amqplib = require('amqplib/callback_api');
+const async = require('async');
 &nbsp;
 const { AmqpConnection } = require('./amqp-connection');
-const { DataTypes, Errors, Events, QueuePattern, Status } = require('./constants');
-const { SdkError } = require('./lib');
+const { DataTypes, Errors, Events, QueuePattern, Status } = require('./../constants');
 &nbsp;
 const DEF_RECONN = 1000;
 &nbsp;
@@ -1179,115 +1253,124 @@ class AmqpQueue extends EventEmitter {
   }
 &nbsp;
   /**
-   * To close the queue. You can use `await` to get the result or listen events.
+   * To close the queue. You can use a callback function to get the result or listen events.
    *
-   * @async
-   * @returns {Promise&lt;void&gt;}
-   * @throws {SdkError}
+   * @param {function} [callback]
+   *   @param {?Error} callback.err
    */
-  async close() {
+  close(callback) {
+    if (typeof callback !== DataTypes.Function) {
+      callback = null;
+    }
+&nbsp;
     if (this.#status === Status.Closing || this.#status === Status.Closed) {
+      if (callback) {
+        return void process.nextTick(() =&gt; callback(null));
+      }
       return;
     } else <span class="missing-if-branch" title="if path not taken" >I</span>if (!this.#channel) {
 <span class="cstat-no" title="statement not covered" >      this.#status = Status.Closed;</span>
 <span class="cstat-no" title="statement not covered" >      this.emit(Events.Status, Status.Closed);</span>
-<span class="cstat-no" title="statement not covered" >      return;</span>
+<span class="cstat-no" title="statement not covered" >      if (callback) {</span>
+<span class="cstat-no" title="statement not covered" >        return void process.nextTick(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >callback(null))</span>;</span>
+      }
     }
 &nbsp;
     this.#status = Status.Closing;
     this.emit(Events.Status, Status.Closing);
 &nbsp;
-    let err;
-    await this.#channel.close().catch(<span class="fstat-no" title="function not covered" >(e</span>) =&gt; (<span class="cstat-no" title="statement not covered" >err = e)</span>);
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (this.#channel) {
-<span class="cstat-no" title="statement not covered" >      this.#channel.removeAllListeners();</span>
-<span class="cstat-no" title="statement not covered" >      this.#channel = null;</span>
-    }
-    this.#status = Status.Closed;
-    this.emit(Events.Status, Status.Closed);
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
-<span class="cstat-no" title="statement not covered" >      throw new SdkError(err.message);</span>
-    }
+    this.#channel.close((err) =&gt; {
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (this.#channel) {
+        this.#channel.removeAllListeners();
+        this.#channel = null;
+      }
+      this.#status = Status.Closed;
+      this.emit(Events.Status, Status.Closed);
+      if (callback) {
+        return void process.nextTick(() =&gt; callback(err));
+      }
+    });
   }
 &nbsp;
   /**
    * To send a message (for senders only).
    *
-   * @async
    * @param {Buffer} payload The raw data to be sent.
-   * @returns {Promise&lt;void&gt;}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    * @throws {Error} Wrong arguments.
-   * @throws {SdkError}
    */
-  async sendMsg(payload) {
+  sendMsg(payload, callback) {
     if (!(payload instanceof Buffer)) {
       throw Error('`payload` is not a Buffer');
+    } else if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
     } else if (this.#status !== Status.Connected) {
-      throw new SdkError(Errors.NotConnected);
+      return void process.nextTick(() =&gt; callback(Error(Errors.NotConnected)));
     } else if (this.#opts.isRecv) {
-      throw new SdkError(Errors.QueueIsReceiver);
+      return void process.nextTick(() =&gt; callback(Error(Errors.QueueIsReceiver)));
     }
 &nbsp;
     const exchange = this.#opts.broadcast ? this.#opts.name : '';
     const routingKey = this.#opts.broadcast ? '' : this.#opts.name;
     if (this.#opts.reliable) {
-      await new Promise((resolve, reject) =&gt; {
-        this.#channel.publish(exchange, routingKey, payload, { mandatory: true }, (err) =&gt; {
-          <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
-<span class="cstat-no" title="statement not covered" >            return reject(new SdkError(err.message));</span>
-          }
-          resolve();
-        });
+      this.#channel.publish(exchange, routingKey, payload, { mandatory: true }, (err) =&gt; {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >          return void callback(err);</span>
+        }
+        callback(null);
       });
     } else {
       this.#channel.publish(exchange, routingKey, payload, { persistent: this.#opts.persistent });
       // Use `setTimeout` instead of `nextTick` because nextTick may causes too much events to hang
       // AMQP packets transmission.
-      await new Promise((resolve) =&gt; setTimeout(resolve, 1));
+      setTimeout(() =&gt; callback(null), 1);
     }
   }
 &nbsp;
   /**
    * Use this if the message is processed successfully.
    *
-   * @async
    * @param {AmqpMessage} msg
-   * @returns {Promise&lt;void&gt;}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    * @throws {Error} Wrong usage.
-   * @throws {SdkError}
    */
-  async ack(msg) {
+  ack(msg, callback) {
     if (!msg || typeof msg !== DataTypes.Object || Array.isArray(msg)) {
       throw Error('`msg` is not an object');
+    } else if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
     }
 &nbsp;
-    if (this.#channel) {
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (this.#channel) {
       this.#channel.ack(msg.meta);
-      await new Promise((resolve) =&gt; process.nextTick(resolve));
     }
+    process.nextTick(() =&gt; callback(null));
   }
 &nbsp;
   /**
    * To requeue the message and the broker will send the message in the future.
    *
-   * @async
    * @param {AmqpMessage} msg
-   * @returns {Promise&lt;void&gt;}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    * @throws {Error} Wrong usage.
-   * @throws {SdkError}
    */
-  async nack(msg) {
+  nack(msg, callback) {
     if (!msg || typeof msg !== DataTypes.Object || Array.isArray(msg)) {
       throw Error('`msg` is not an object');
+    } else if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
     }
 &nbsp;
-    if (this.#channel) {
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (this.#channel) {
       this.#channel.nack(msg.meta);
-      await new Promise((resolve) =&gt; process.nextTick(resolve));
     }
+    process.nextTick(() =&gt; callback(null));
   }
 &nbsp;
-  async #innerConnect() {
+  #innerConnect() {
     if (this.#status !== Status.Connecting || this.#connProcessing) {
       return;
     }
@@ -1303,46 +1386,65 @@ class AmqpQueue extends EventEmitter {
 <span class="cstat-no" title="statement not covered" >      return void setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >this.#innerConnect(),</span> this.#opts.reconnectMillis);</span>
     }
 &nbsp;
-    try {
-      // Create a channel.
-      const channel = this.#opts.reliable
-        ? await rawConn.createConfirmChannel()
-        : await rawConn.createChannel();
+    const self = this;
+    let channel;
+    async.waterfall(
+      [
+        // Create a channel.
+        function (cb) {
+          const fn = self.#opts.reliable
+            ? rawConn.createConfirmChannel.bind(rawConn)
+            : rawConn.createChannel.bind(rawConn);
+          fn((err, ch) =&gt; {
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >              return void cb(err);</span>
+            }
+            channel = ch;
+            cb(null);
+          });
+        },
+        // Declare resources for unicast or broadcast.
+        function (cb) {
+          if (self.#opts.broadcast) {
+            self.#createBroadcast(channel, (err, qname) =&gt; cb(err, qname));
+          } else {
+            self.#createUnicast(channel, (err) =&gt; cb(err, self.#opts.name));
+          }
+        },
+        // Set handlers before consuming to prevent `onMessage`.
+        function (qname, cb) {
+          channel.on('close', self.#onClose.bind(self));
+          channel.on('drain', self.#onDrain.bind(self));
+          channel.on('error', self.#onError.bind(self));
+          channel.on('return', self.#onReturn.bind(self));
+          self.#channel = channel;
+          cb(null, qname);
+        },
+        // Set prefetch and consume the incoming messages.
+        function (qname, cb) {
+          if (!self.#opts.isRecv) {
+            return void cb(null);
+          }
 &nbsp;
-      // Declare resources for unicast or broadcast.
-      let qname;
-      if (this.#opts.broadcast) {
-        qname = await this.#createBroadcast(channel);
-      } else {
-        await this.#createUnicast(channel);
-        qname = this.#opts.name;
+          channel.prefetch(self.#opts.prefetch);
+          channel.consume(qname, self.#innerOnMessage.bind(self), {}, (err) =&gt; cb(err));
+        },
+      ],
+      (err) =&gt; {
+        self.#connProcessing = false;
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >          if (self.#channel) {</span>
+<span class="cstat-no" title="statement not covered" >            self.#channel.removeAllListeners();</span>
+<span class="cstat-no" title="statement not covered" >            self.#channel = null;</span>
+          }
+<span class="cstat-no" title="statement not covered" >          self.emit(Events.Error, err);</span>
+<span class="cstat-no" title="statement not covered" >          return void setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >self.#innerConnect(),</span> self.#opts.reconnectMillis);</span>
+        }
+&nbsp;
+        self.#status = Status.Connected;
+        self.emit(Events.Status, Status.Connected);
       }
-&nbsp;
-      this.#connProcessing = false;
-&nbsp;
-      channel.on('close', this.#onClose.bind(this));
-      channel.on('drain', this.#onDrain.bind(this));
-      channel.on('error', this.#onError.bind(this));
-      channel.on('return', this.#onReturn.bind(this));
-      this.#channel = channel;
-&nbsp;
-      // Set prefetch and consume the incoming messages.
-      if (this.#opts.isRecv) {
-        await channel.prefetch(this.#opts.prefetch);
-        await channel.consume(qname, this.#innerOnMessage.bind(this), {});
-      }
-&nbsp;
-      this.#status = Status.Connected;
-      this.emit(Events.Status, Status.Connected);
-    } catch (err) {
-<span class="cstat-no" title="statement not covered" >      if (this.#channel) {</span>
-<span class="cstat-no" title="statement not covered" >        this.#channel.removeAllListeners();</span>
-<span class="cstat-no" title="statement not covered" >        this.#channel = null;</span>
-      }
-<span class="cstat-no" title="statement not covered" >      this.#connProcessing = false;</span>
-<span class="cstat-no" title="statement not covered" >      this.emit(Events.Error, err);</span>
-<span class="cstat-no" title="statement not covered" >      return void setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >this.#innerConnect(),</span> this.#opts.reconnectMillis);</span>
-    }
+    );
   }
 &nbsp;
   /**
@@ -1363,41 +1465,50 @@ class AmqpQueue extends EventEmitter {
   /**
    * To create resouces for the broadcast queue.
    *
-   * @async
    * @param {amqplib.Channel} channel
-   * @returns {Promise&lt;string&gt;} The name of the temporary queue.
-   * @throws {SdkError}
+   * @param {function} callback
+   *   @param {?Error} callback.err
+   *   @param {string} callback.qname The name of the temporary queue.
    */
-  async #createBroadcast(channel) {
-    try {
-      // Declare the fanout exchange.
-      await channel.assertExchange(this.#opts.name, amqplibConsts.Fanout, { durable: false });
+  #createBroadcast(channel, callback) {
+    const self = this;
 &nbsp;
-      // Declare a temporary queue and bind the queue name to the exchange.
-      if (!this.#opts.isRecv) {
-        return '';
+    async.waterfall(
+      [
+        // Declare the fanout exchange.
+        function (cb) {
+          const opts = { durable: false };
+          channel.assertExchange(self.#opts.name, amqplibConsts.Fanout, opts, (err) =&gt; cb(err));
+        },
+        // Declare a temporary queue and bind the queue name to the exchange.
+        function (cb) {
+          if (!self.#opts.isRecv) {
+            return void cb(null, '');
+          }
+&nbsp;
+          channel.assertQueue('', { exclusive: true }, (err, q) =&gt; {
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >              return void cb(err);</span>
+            }
+            channel.bindQueue(q.queue, self.#opts.name, '', {}, (err) =&gt; cb(err, q.name));
+          });
+        },
+      ],
+      (err, qname) =&gt; {
+        callback(err, qname);
       }
-&nbsp;
-      const q = await channel.assertQueue('', { exclusive: true });
-      await channel.bindQueue(q.name, this.#opts.name, '', {});
-      return q.name;
-    } catch (err) {
-<span class="cstat-no" title="statement not covered" >      throw new SdkError(err.message);</span>
-    }
+    );
   }
 &nbsp;
   /**
    * To create resouces for the unicast queue.
    *
-   * @async
    * @param {amqplib.Channel} channel
-   * @returns {Promise&lt;void&gt;}
-   * @throws {SdkError}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    */
-  async #createUnicast(channel) {
-    await channel.assertQueue(this.#opts.name, { durable: true }).catch(<span class="fstat-no" title="function not covered" >(e</span>rr) =&gt; {
-<span class="cstat-no" title="statement not covered" >      throw new SdkError(err.message);</span>
-    });
+  #createUnicast(channel, callback) {
+    channel.assertQueue(this.#opts.name, { durable: true }, (err) =&gt; callback(err));
   }
 &nbsp;
   /**
@@ -1473,14 +1584,14 @@ module.exports = {
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
                 at 2025-07-16T14:48:39.738Z
             </div>
-        <script src="../../prettify.js"></script>
+        <script src="../../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../sorter.js"></script>
-        <script src="../../block-navigation.js"></script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
     </body>
 </html>
     
