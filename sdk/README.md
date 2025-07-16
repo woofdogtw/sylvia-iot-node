@@ -11,6 +11,8 @@
 SDK for developing networks (adapters) and applications on Sylvia-IoT. The SDK contains:
 
 - `api`: utilities for accessing Sylvia-IoT **coremgr** APIs.
+  - `api/callback`: the callback format APIs.
 - `middlewares`: middlewares.
   - `auth`: token authentication.
 - `mq`: managers for managing network/application connections/queues by using `general-mq`.
+  - `mq/callback`: the callback format APIs.

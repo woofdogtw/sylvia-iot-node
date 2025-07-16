@@ -3,8 +3,7 @@
 const { EventEmitter } = require('events');
 
 const { MqttConnection } = require('./mqtt-connection');
-const { DataTypes, Errors, Events, QueuePattern, Status } = require('./constants');
-const { SdkError } = require('./lib');
+const { DataTypes, Errors, Events, QueuePattern, Status } = require('./../constants');
 
 const DEF_RECONN = 1000;
 
@@ -173,94 +172,105 @@ class MqttQueue extends EventEmitter {
   }
 
   /**
-   * To close the queue. You can use `await` to get the result or listen events.
+   * To close the queue. You can use a callback function to get the result or listen events.
    *
-   * @async
-   * @returns {Promise<void>}
-   * @throws {SdkError}
+   * @param {function} [callback]
+   *   @param {?Error} callback.err
    */
-  async close() {
+  close(callback) {
+    if (typeof callback !== DataTypes.Function) {
+      callback = null;
+    }
+
     if (
       this.#status === Status.Closing ||
       this.#status === Status.Closed ||
       !this.#conn.getRawConnection()
     ) {
+      if (callback) {
+        return void process.nextTick(() => callback(null));
+      }
       return;
     }
 
-    let err;
+    const rawConn = this.#conn.getRawConnection();
     this.#status = Status.Closing;
     this.emit(Events.Status, Status.Closing);
-    const rawConn = this.#conn.getRawConnection();
-    await rawConn.unsubscribeAsync(this.#topic()).catch((e) => (err = e));
-    if (this.#opts.isRecv) {
-      this.#conn.removePacketHandler(this.#opts.name);
-    }
-    this.#status = Status.Closed;
-    this.emit(Events.Status, Status.Closed);
-    if (err) {
-      throw new SdkError(err.message);
-    }
+    rawConn.unsubscribe(this.#topic(), (err) => {
+      if (this.#opts.isRecv) {
+        this.#conn.removePacketHandler(this.#opts.name);
+      }
+      this.#status = Status.Closed;
+      this.emit(Events.Status, Status.Closed);
+      if (callback) {
+        return void process.nextTick(() => callback(err));
+      }
+    });
   }
 
   /**
    * To send a message (for senders only).
    *
-   * @async
    * @param {Buffer} payload The raw data to be sent.
-   * @returns {Promise<void>}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    * @throws {Error} Wrong arguments.
-   * @throws {SdkError}
    */
-  async sendMsg(payload) {
+  sendMsg(payload, callback) {
     if (!(payload instanceof Buffer)) {
       throw Error('`payload` is not a Buffer');
+    } else if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
     } else if (this.#status !== Status.Connected) {
-      throw new SdkError(Errors.NotConnected);
+      return void process.nextTick(() => callback(Error(Errors.NotConnected)));
     } else if (this.#opts.isRecv) {
-      throw new SdkError(Errors.QueueIsReceiver);
+      return void process.nextTick(() => callback(Error(Errors.QueueIsReceiver)));
     }
 
     const rawConn = this.#conn.getRawConnection();
     const opts = {
       qos: this.#opts.reliable ? 1 : 0,
     };
-    await rawConn.publishAsync(this.#topic(), payload, opts).catch((err) => {
-      throw SdkError(err.message);
-    });
+    rawConn.publish(this.#topic(), payload, opts, (err) => callback(err));
   }
 
   /**
    * Use this if the message is processed successfully.
    *
-   * @async
    * @param {MqttMessage} msg
-   * @returns {Promise<void>}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    * @throws {Error} Wrong usage.
-   * @throws {SdkError}
    */
-  async ack(msg) {
+  ack(msg, callback) {
     if (!msg || typeof msg !== DataTypes.Object || Array.isArray(msg)) {
       throw Error('`msg` is not an object');
+    } else if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
     }
+
+    process.nextTick(() => callback(null));
   }
 
   /**
    * To requeue the message and the broker will send the message in the future.
    *
-   * @async
    * @param {MqttMessage} msg
-   * @returns {Promise<void>}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    * @throws {Error} Wrong usage.
-   * @throws {SdkError}
    */
-  async nack(msg) {
+  nack(msg, callback) {
     if (!msg || typeof msg !== DataTypes.Object || Array.isArray(msg)) {
       throw Error('`msg` is not an object');
+    } else if (typeof callback !== DataTypes.Function) {
+      throw Error('`callback` is not a function');
     }
+
+    process.nextTick(() => callback(null));
   }
 
-  async #innerConnect() {
+  #innerConnect() {
     if (this.#status !== Status.Connecting || this.#connProcessing) {
       return;
     }
@@ -283,18 +293,18 @@ class MqttQueue extends EventEmitter {
       return;
     }
 
-    let err;
     const opts = {
       qos: this.#opts.reliable ? 1 : 0,
     };
-    await rawConn.subscribeAsync(this.#topic(), opts).catch((e) => (err = e));
-    this.#connProcessing = false;
-    if (err) {
-      return void setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
-    }
+    rawConn.subscribe(this.#topic(), opts, (err) => {
+      this.#connProcessing = false;
+      if (err) {
+        return void setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
+      }
 
-    this.#status = Status.Connected;
-    this.emit(Events.Status, Status.Connected);
+      this.#status = Status.Connected;
+      this.emit(Events.Status, Status.Connected);
+    });
   }
 
   /**

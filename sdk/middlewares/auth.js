@@ -44,11 +44,13 @@ function authMiddleware(authUri) {
     superagent
       .agent(keepAliveAgent)
       .auth(token.substr(7), { type: 'bearer' })
-      .get(authUri, (err, authRes) => {
+      .get(authUri)
+      .ok((res) => !!res)
+      .then((authRes) => {
         if (!authRes) {
-          return void res.status(503).json({
-            code: 'err_rsc',
-            message: `${err}`,
+          return void res.status(500).json({
+            code: 'err_unknown',
+            message: `unexpected error`,
           });
         } else if (authRes.statusCode === 401) {
           return void res.status(401).json({ code: 'err_auth' });
@@ -64,6 +66,12 @@ function authMiddleware(authUri) {
           info: authRes.body.data,
         };
         next();
+      })
+      .catch((err) => {
+        return void res.status(503).json({
+          code: 'err_rsc',
+          message: `${err}`,
+        });
       });
   };
 }

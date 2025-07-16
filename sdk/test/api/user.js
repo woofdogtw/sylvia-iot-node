@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 
-const { DataTypes } = require('general-mq/lib/constants');
+const { DataTypes } = require('general-mq').constants;
 
 const { Client, ClientOptions } = require('../../api/http');
 const userapi = require('../../api/user');
@@ -15,7 +15,7 @@ const CLIENT_SECRET = 'secret';
 // Pre-registered user/client in sylvia-iot-auth.
 const ACCOUNT = 'admin';
 
-function testGet(done) {
+async function testGet() {
   /** @type {ClientOptions} */
   const opts = {
     authBase: AUTH_BASE,
@@ -26,23 +26,20 @@ function testGet(done) {
   const client = new Client(opts);
   assert.ok(client);
 
-  userapi.get(client, (err, data) => {
-    if (err) {
-      return void done(err);
-    } else if (!data || typeof data !== DataTypes.Object) {
-      return void done(Error('no data'));
-    } else if (data.account !== ACCOUNT) {
-      return void done(Error(`wrong account ${data.account} vs. ${ACCOUNT}`));
-    } else if (!(data.createdAt instanceof Date) || isNaN(data.createdAt.getTime())) {
-      return void done(Error('`createdAt` is not a Date'));
-    } else if (!(data.modifiedAt instanceof Date) || isNaN(data.modifiedAt.getTime())) {
-      return void done(Error('`modifiedAt` is not a Date'));
-    }
-    done(null);
-  });
+  const data = await userapi.get(client);
+  assert.ok(data && typeof data === DataTypes.Object, 'no data');
+  assert.strictEqual(data.account, ACCOUNT, `wrong account ${data.account} vs. ${ACCOUNT}`);
+  assert.ok(
+    data.createdAt instanceof Date && !isNaN(data.createdAt.getTime()),
+    '`createdAt` is not a Date'
+  );
+  assert.ok(
+    data.modifiedAt instanceof Date && !isNaN(data.modifiedAt.getTime()),
+    '`modifiedAt` is not a Date'
+  );
 }
 
-function testGetErr(done) {
+async function testGetErr() {
   /** @type {ClientOptions} */
   const opts = {
     authBase: AUTH_BASE,
@@ -53,19 +50,16 @@ function testGetErr(done) {
   const client = new Client(opts);
   assert.ok(client);
 
-  assert.throws(() => {
-    userapi.get({});
-  });
-  assert.throws(() => {
-    userapi.get(client, {});
-  });
+  const shouldErrFn = (data) => {
+    throw Error(`should error, data: ${JSON.stringify(data)}`);
+  };
+  const catchFn = (err) => assert.ok(!(err instanceof SdkError));
 
-  userapi.get(client, (err, data) => {
-    done(err ? null : Error(`sould error, data: ${JSON.stringify(data)}`));
-  });
+  userapi.get({}).then(shouldErrFn).catch(catchFn);
+  userapi.get(client).then(shouldErrFn).catch(catchFn);
 }
 
-function testUpdate(done) {
+async function testUpdate() {
   /** @type {ClientOptions} */
   const opts = {
     authBase: AUTH_BASE,
@@ -76,12 +70,10 @@ function testUpdate(done) {
   const client = new Client(opts);
   assert.ok(client);
 
-  userapi.update(client, { name: 'test' }, (err) => {
-    done(err || null);
-  });
+  await userapi.update(client, { name: 'test' });
 }
 
-function testUpdateErr(done) {
+async function testUpdateErr() {
   /** @type {ClientOptions} */
   const opts = {
     authBase: AUTH_BASE,
@@ -92,19 +84,14 @@ function testUpdateErr(done) {
   const client = new Client(opts);
   assert.ok(client);
 
-  assert.throws(() => {
-    userapi.update({});
-  });
-  assert.throws(() => {
-    userapi.update(client, null);
-  });
-  assert.throws(() => {
-    userapi.update(client, {}, {});
-  });
+  const shouldErrFn = (data) => {
+    throw Error(`should error, data: ${JSON.stringify(data)}`);
+  };
+  const catchFn = (err) => assert.ok(!(err instanceof SdkError));
 
-  userapi.update(client, { name: 'name' }, (err, data) => {
-    done(err ? null : Error(`sould error, data: ${JSON.stringify(data)}`));
-  });
+  userapi.update({}).then(shouldErrFn).catch(catchFn);
+  userapi.update(client, null).then(shouldErrFn).catch(catchFn);
+  userapi.update(client, { name: 'name' }).then(shouldErrFn).catch(catchFn);
 }
 
 module.exports = {

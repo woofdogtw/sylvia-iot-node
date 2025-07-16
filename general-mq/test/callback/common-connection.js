@@ -2,9 +2,9 @@
 
 const assert = require('assert');
 
-const gmq = require('..');
+const gmq = require('../../lib/callback');
 const { AmqpConnection, AmqpQueue, MqttConnection, MqttQueue } = gmq;
-const { Events, Status } = require('../lib/constants');
+const { Events, Status } = require('../../lib/constants');
 
 const RETRY_10MS = 100;
 
@@ -14,16 +14,20 @@ const RETRY_10MS = 100;
  * @property {AmqpQueue|MqttQueue} Queue
  */
 
-async function afterEach() {
+function afterEach(done) {
   let withErr = null;
-  for (;;) {
+  (function closeConnFn() {
     const conn = module.exports.conn.pop();
     if (!conn) {
-      assert.ok(!withErr, withErr);
-      return;
+      return void done(withErr);
     }
-    await conn.close().catch((err) => (withErr = err));
-  }
+    conn.close((err) => {
+      if (err) {
+        withErr = err;
+      }
+      closeConnFn();
+    });
+  })();
 }
 
 /**
@@ -96,13 +100,15 @@ function properties(engine) {
  * @param {Engine} engine
  */
 function connectNoHandler(engine) {
-  return async function () {
+  return function (done) {
     const conn = new engine.Connection();
     assert.ok(conn);
 
     module.exports.conn.push(conn);
     conn.connect();
-    await waitConnected(conn);
+    waitConnected(conn, function (err) {
+      done(err);
+    });
   };
 }
 
@@ -176,14 +182,32 @@ function connectInsecure(engine) {
  * @param {Engine} engine
  */
 function close(engine) {
-  return async function () {
+  return function (done) {
     const conn = new engine.Connection();
     assert.ok(conn);
+    let recvConnected = false;
+    conn.on(Events.Status, (status) => {
+      if (status === Status.Connected) {
+        recvConnected = true;
+        conn.close((err) => {
+          if (err) {
+            done(err);
+          } else if (conn.status() !== Status.Closed) {
+            done(Error(`closed with status ${conn.status()}`));
+          }
+        });
+      } else if (status === Status.Closed) {
+        if (recvConnected) {
+          if (conn.status() !== Status.Closed) {
+            return void done(Error(`closed with status ${conn.status()}`));
+          }
+          done(null);
+        }
+      }
+    });
+
     module.exports.conn.push(conn);
     conn.connect();
-    await waitConnected(conn);
-    await conn.close();
-    assert.ok(conn.status() === Status.Closed);
   };
 }
 
@@ -193,55 +217,75 @@ function close(engine) {
  * @param {Engine} engine
  */
 function closeAfterClose(engine) {
-  return async function () {
+  return function (done) {
     const conn = new engine.Connection();
     assert.ok(conn);
+    let recvConnected = false;
+    conn.on(Events.Status, (status) => {
+      if (status === Status.Connected) {
+        recvConnected = true;
+        conn.close((err) => {
+          if (err) {
+            done(err);
+          }
+        });
+      } else if (status === Status.Closed) {
+        if (recvConnected) {
+          conn.close(done);
+        }
+      }
+    });
+
     module.exports.conn.push(conn);
     conn.connect();
-    await waitConnected(conn);
-    await conn.close();
-    assert.ok(conn.status() === Status.Closed);
-    await conn.close();
   };
 }
 
 /**
- * Test `close()` without await.
+ * Test `close()` without callback.
  *
  * @param {Engine} engine
  */
-function closeNoAwait(engine) {
-  return async function () {
+function closeNoCallback(engine) {
+  return function (done) {
     const conn = new engine.Connection();
     assert.ok(conn);
+    let recvConnected = false;
+    conn.on(Events.Status, (status) => {
+      if (status === Status.Connected) {
+        recvConnected = true;
+        conn.close();
+      } else if (status === Status.Closed) {
+        if (recvConnected) {
+          conn.close();
+          done(null);
+        }
+      }
+    });
+
     module.exports.conn.push(conn);
     conn.connect();
-    await waitConnected(conn);
-    conn.close();
-    for (let i = 0; i < RETRY_10MS; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 10));
-      if (conn.status() === Status.Closed) {
-        return;
-      }
-    }
-    throw Error('not closed');
   };
 }
 
 /**
  * @private
- * @async
  * @param {AmqpConnection|MqttConnection} conn
- * @throws {Error}
+ * @param {function} callback
+ *   @param {?Error} callback.err
  */
-async function waitConnected(conn) {
-  for (let i = 0; i < RETRY_10MS; i++) {
-    await new Promise((resolve) => setTimeout(resolve, 10));
-    if (conn.status() === Status.Connected) {
-      return;
+function waitConnected(conn, callback) {
+  let retry = RETRY_10MS;
+  const waitFn = function () {
+    if (retry < 0) {
+      return void callback(Error('not connected'));
+    } else if (conn.status() === Status.Connected) {
+      return void callback(null);
     }
-  }
-  throw Error('not connected');
+    retry--;
+    setTimeout(waitFn, 10);
+  };
+  setTimeout(waitFn, 10);
 }
 
 module.exports = {
@@ -258,5 +302,5 @@ module.exports = {
   connectInsecure,
   close,
   closeAfterClose,
-  closeNoAwait,
+  closeNoCallback,
 };

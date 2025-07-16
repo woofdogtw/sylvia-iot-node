@@ -3,115 +3,82 @@
 const { Agent } = require('http');
 const { URL } = require('url');
 
-const async = require('async');
 const superagent = require('superagent');
 
 const gmq = require('general-mq');
-const { AmqpQueue } = require('general-mq/lib/amqp-queue');
-const { Events, Status } = require('general-mq/lib/constants');
-const { MqttQueue } = require('general-mq/lib/mqtt-queue');
+const { AmqpQueue, MqttQueue } = gmq;
+const { Events, Status } = gmq.constants;
 
 const { ApplicationMgr } = require('../../mq/application');
 const { Connection } = require('../../mq/lib');
 const { NetworkMgr } = require('../../mq/network');
 
+/**
+ * Connection with counter.
+ *
+ * @typedef {Object} CounterConnection
+ * @property {gmq.AmqpConnection|gmq.MqttConnection} conn
+ * @property {number} count
+ */
+
 const keepAliveAgent = new Agent({ keepAlive: true });
 
-function afterEachFn(done) {
-  async.waterfall(
-    [
-      function (cb) {
-        (function waitFn() {
-          const mgr = module.exports.appMgrs.pop();
-          if (!mgr) {
-            return void cb(null);
-          }
-          mgr.removeAllListeners();
-          mgr.close((err) => {
-            if (err) {
-              return void cb(err);
-            }
-            waitFn();
-          });
-        })();
-      },
-      function (cb) {
-        (function waitFn() {
-          const mgr = module.exports.netMgrs.pop();
-          if (!mgr) {
-            return void cb(null);
-          }
-          mgr.removeAllListeners();
-          mgr.close((err) => {
-            if (err) {
-              return void cb(err);
-            }
-            waitFn();
-          });
-        })();
-      },
-      function (cb) {
-        const keys = [];
-        for (const k of module.exports.mgrConns.keys()) {
-          keys.push(k);
-        }
-        (function waitFn(index) {
-          if (index >= keys.length) {
-            module.exports.mgrConns.clear();
-            return void cb(null);
-          }
-          const conn = module.exports.mgrConns.get(keys[index]);
-          conn.conn.removeAllListeners();
-          conn.conn.close((err) => {
-            if (err) {
-              return void cb(err);
-            }
-            waitFn(index + 1);
-          });
-        })(0);
-      },
-      function (cb) {
-        (function waitFn() {
-          const queue = module.exports.appNetQueues.pop();
-          if (!queue) {
-            return void cb(null);
-          }
-          queue.removeAllListeners();
-          queue.close((err) => {
-            if (err) {
-              return void cb(err);
-            }
-            waitFn();
-          });
-        })();
-      },
-      function (cb) {
-        const conn = module.exports.appNetConn;
-        module.exports.appNetConn = null;
-        if (!conn) {
-          return void cb(null);
-        }
-        conn.conn.removeAllListeners();
-        conn.conn.close((err) => {
-          cb(err || null);
-        });
-      },
-    ],
-    done
-  );
+async function afterEachFn() {
+  for (;;) {
+    const mgr = module.exports.appMgrs.pop();
+    if (!mgr) {
+      break;
+    }
+    mgr.removeAllListeners();
+    await mgr.close();
+  }
+  for (;;) {
+    const mgr = module.exports.netMgrs.pop();
+    if (!mgr) {
+      break;
+    }
+    mgr.removeAllListeners();
+    await mgr.close();
+  }
+  for (const [_, conn] of module.exports.mgrConns) {
+    conn.conn.removeAllListeners();
+    await conn.conn.close();
+  }
+  module.exports.mgrConns.clear();
+  for (;;) {
+    const queue = module.exports.appNetQueues.pop();
+    if (!queue) {
+      break;
+    }
+    queue.removeAllListeners();
+    await queue.close();
+  }
+  const conn = module.exports.appNetConn;
+  module.exports.appNetConn = null;
+  if (conn) {
+    conn.conn.removeAllListeners();
+    await conn.conn.close();
+  }
 }
 
-function newConnection(engine, callback) {
-  const conn = new engine.Connection();
-  conn.on(Events.Status, (status) => {
-    if (status === Status.Connected) {
-      callback(null, {
-        conn,
-        counter: 0,
-      });
-    }
+/**
+ * @async
+ * @param {gmq.Engine} engine
+ * @returns {Promise<CounterConnection>}
+ */
+async function newConnection(engine) {
+  return new Promise((resolve) => {
+    const conn = new engine.Connection();
+    conn.on(Events.Status, (status) => {
+      if (status === Status.Connected) {
+        return void resolve({
+          conn,
+          counter: 0,
+        });
+      }
+    });
+    conn.connect();
   });
-  conn.connect();
 }
 
 function connHostUri(engine) {
@@ -123,43 +90,37 @@ function connHostUri(engine) {
   throw Error('unsupport engine');
 }
 
-function removeRabbitmqQueues(done) {
-  function removeQueues(queues, callback) {
-    const queue = queues.pop();
-    if (!queue) {
-      return void process.nextTick(() => {
-        callback(null);
-      });
-    } else if (queue.name.startsWith('amq.')) {
-      return void process.nextTick(() => {
-        removeQueues(queues, callback);
-      });
-    }
-
-    superagent
-      .agent(keepAliveAgent)
-      .auth('guest', 'guest')
-      .delete(`http://localhost:15672/api/queues/%2f/${queue.name}`, (err, res) => {
-        if (err) {
-          return void callback(Error(`delete queue ${queue.name} error: ${err}`));
-        } else if (res.statusCode !== 204 && res.statusCode !== 404) {
-          return void callback(Error(`delete queues with status ${res.statusCode}`));
-        }
-        removeQueues(queues, callback);
-      });
-  }
-
-  superagent
+async function removeRabbitmqQueues() {
+  let res = await superagent
     .agent(keepAliveAgent)
     .auth('guest', 'guest')
-    .get('http://localhost:15672/api/queues/%2f', (err, res) => {
-      if (err) {
-        return void done(Error(`get queue error: ${err}`));
-      } else if (res.statusCode !== 200) {
-        return void done(Error(`get queues with status ${res.statusCode}`));
-      }
-      removeQueues(res.body, done);
+    .get('http://localhost:15672/api/queues/%2f')
+    .catch((err) => {
+      throw Error(`get queue error: ${err}`);
     });
+  if (res.statusCode !== 200) {
+    throw Error(`get queues with status ${res.statusCode}`);
+  }
+  const queues = res.body;
+  for (;;) {
+    const queue = queues.pop();
+    if (!queue) {
+      break;
+    } else if (queue.name.startsWith('amq.')) {
+      continue;
+    }
+
+    res = await superagent
+      .agent(keepAliveAgent)
+      .auth('guest', 'guest')
+      .delete(`http://localhost:15672/api/queues/%2f/${queue.name}`)
+      .catch((err) => {
+        throw Error(`delete queue ${queue.name} error: ${err}`);
+      });
+    if (res.statusCode !== 204 && res.statusCode !== 404) {
+      throw Error(`delete queues with status ${res.statusCode}`);
+    }
+  }
 }
 
 module.exports = {

@@ -3,9 +3,10 @@
 const { EventEmitter } = require('events');
 const { URL } = require('url');
 
-const gmq = require('general-mq');
-const { AmqpQueue, MqttQueue, SdkError } = gmq;
-const { DataTypes, Status, Events } = gmq.constants;
+const async = require('async');
+
+const { AmqpQueue, MqttQueue } = require('general-mq/lib/callback');
+const { DataTypes, Status, Events } = require('general-mq').constants;
 const {
   Connection,
   DataMqStatus,
@@ -14,7 +15,7 @@ const {
   newDataQueues,
   removeConnection,
 } = require('./lib');
-const { MgrStatus, Errors } = require('./constants');
+const { MgrStatus, Errors } = require('../constants');
 
 /**
  * Uplink data from broker to application.
@@ -221,30 +222,47 @@ class ApplicationMgr extends EventEmitter {
    * To close the manager queues.
    * The underlying connection will be closed when there are no queues use it.
    *
-   * @async
-   * @throws {SdkError}
+   * @param {function} callback
+   *   @param {?Error} callback.err
    */
-  async close() {
-    this.#uldata.removeAllListeners();
-    await this.#uldata.close();
-    this.#dldata.removeAllListeners();
-    await this.#dldata.close();
-    this.#dldataResp.removeAllListeners();
-    await this.#dldataResp.close();
-    this.#dldataResult.removeAllListeners();
-    await this.#dldataResult.close();
-    await removeConnection(this.#connPool, this.#hostUri, 4);
+  close(callback) {
+    const self = this;
+
+    async.waterfall(
+      [
+        function (cb) {
+          self.#uldata.removeAllListeners();
+          self.#uldata.close((err) => cb(err || null));
+        },
+        function (cb) {
+          self.#dldata.removeAllListeners();
+          self.#dldata.close((err) => cb(err || null));
+        },
+        function (cb) {
+          self.#dldataResp.removeAllListeners();
+          self.#dldataResp.close((err) => cb(err || null));
+        },
+        function (cb) {
+          self.#dldataResult.removeAllListeners();
+          self.#dldataResult.close((err) => cb(err || null));
+        },
+        function (cb) {
+          removeConnection(self.#connPool, self.#hostUri, 4, (err) => cb(err || null));
+        },
+      ],
+      callback
+    );
   }
 
   /**
    * Send downlink data `AppDlData` to the broker.
    *
-   * @async
    * @param {AppDlData} data
+   * @param {function} callback
+   *   @param {?Error} callback.err
    * @throws {Error} Wrong arguments.
-   * @throws {SdkError}
    */
-  async sendDlData(data) {
+  sendDlData(data, callback) {
     if (!data || typeof data !== DataTypes.Object || Array.isArray(data)) {
       throw Error('`data` is not an object');
     } else if (!data.correlationId || typeof data.correlationId !== DataTypes.String) {
@@ -280,7 +298,7 @@ class ApplicationMgr extends EventEmitter {
       extension: data.extension || undefined,
     };
     const payload = Buffer.from(JSON.stringify(dldata));
-    await this.#dldata.sendMsg(payload);
+    this.#dldata.sendMsg(payload, (err) => callback(err || null));
   }
 
   /**
@@ -314,7 +332,7 @@ class ApplicationMgr extends EventEmitter {
     try {
       data = JSON.parse(msg.payload.toString());
     } catch (e) {
-      queue.ack(msg);
+      queue.ack(msg, (_err) => {});
       return;
     }
 
@@ -324,25 +342,25 @@ class ApplicationMgr extends EventEmitter {
       data.data = Buffer.from(data.data, 'hex');
       this.#mgrMsgHandler.onUlData(this, data, (err) => {
         if (err) {
-          this.#uldata.nack(msg);
+          this.#uldata.nack(msg, (_err) => {});
         } else {
-          this.#uldata.ack(msg);
+          this.#uldata.ack(msg, (_err) => {});
         }
       });
     } else if (queue.name() === this.#dldataResp.name()) {
       this.#mgrMsgHandler.onDlDataResp(this, data, (err) => {
         if (err) {
-          this.#dldataResp.nack(msg);
+          this.#dldataResp.nack(msg, (_err) => {});
         } else {
-          this.#dldataResp.ack(msg);
+          this.#dldataResp.ack(msg, (_err) => {});
         }
       });
     } else if (queue.name() === this.#dldataResult.name()) {
       this.#mgrMsgHandler.onDlDataResult(this, data, (err) => {
         if (err) {
-          this.#dldataResult.nack(msg);
+          this.#dldataResult.nack(msg, (_err) => {});
         } else {
-          this.#dldataResult.ack(msg);
+          this.#dldataResult.ack(msg, (_err) => {});
         }
       });
     } else {

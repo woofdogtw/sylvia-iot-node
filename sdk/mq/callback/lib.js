@@ -2,11 +2,11 @@
 
 const { URL } = require('url');
 
-const gmq = require('general-mq');
-const { AmqpConnection, AmqpQueue, MqttConnection, MqttQueue, SdkError } = gmq;
-const { DataTypes } = gmq.constants;
+const gmq = require('general-mq/lib/callback');
+const { AmqpConnection, AmqpQueue, MqttConnection, MqttQueue } = gmq;
+const { DataTypes } = require('general-mq').constants;
 
-const { Status } = require('./constants');
+const { Status } = require('../constants');
 
 /**
  * Detail queue connection status.
@@ -148,16 +148,17 @@ function getConnection(connPool, hostUri) {
 /**
  * Utility function to remove connection from the pool if the reference count meet zero.
  *
- * @async
+ * @private
  * @param {Map<string, Connection>} connPool
  * @param {string} hostUri
  * @param {number} count
- * @throws {SdkError}
+ * @param {function} callback
+ *   @param {?Error} callback.err
  */
-async function removeConnection(connPool, hostUri, count) {
+function removeConnection(connPool, hostUri, count, callback) {
   const conn = connPool.get(hostUri);
   if (!conn) {
-    return;
+    return void process.nextTick(() => callback(null));
   }
 
   conn.count -= count;
@@ -165,7 +166,7 @@ async function removeConnection(connPool, hostUri, count) {
     connPool.delete(hostUri);
   }
   conn.conn.removeAllListeners();
-  await conn.conn.close();
+  conn.conn.close((err) => callback(err || null));
 }
 
 /**
