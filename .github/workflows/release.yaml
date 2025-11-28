@@ -8,7 +8,9 @@ env:
   BIN_DIR: dist
   SBOM_DIR: sbom
 permissions:
+  contents: write
   id-token: write
+  packages: write
 jobs:
   npm:
     name: Publish NPM
