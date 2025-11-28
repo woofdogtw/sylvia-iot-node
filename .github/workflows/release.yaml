@@ -9,7 +9,6 @@ env:
   SBOM_DIR: sbom
 permissions:
   id-token: write
-  contents: read
 jobs:
   npm:
     name: Publish NPM

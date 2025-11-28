@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2 - 2025-11-28
+
+### Changed
+
+- Fix GitHub Release permission for GitHub Actions.
+
 ## 0.2.1 - 2025-11-28
 
 ### Changed
