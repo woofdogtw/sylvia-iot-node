@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 - 2025-11-28
+
+### Changed
+
+- Update dependencies and fix vulnerabilities.
+- Update NPM package release flow with trusted publishing.
+
 ## 0.2.0 - 2025-07-16
 
 ### Changed
