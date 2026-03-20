@@ -128,7 +128,7 @@ class MqttConnection extends EventEmitter {
   }
 
   /**
-   * To connect to the message broker. The `AmqpConnection` will report status with Status.
+   * To connect to the message broker. The `MqttConnection` will report status with Status.
    */
   connect() {
     if (this.#status !== Status.Closed && this.#status !== Status.Closing) {
@@ -221,7 +221,7 @@ class MqttConnection extends EventEmitter {
     this.#packetHandlers.delete(name);
   }
 
-  async #innerConnect() {
+  #innerConnect() {
     const urlInfo = new URL(this.#opts.uri);
     const opts = {
       reconnectPeriod: this.#opts.reconnectMillis,
@@ -234,11 +234,7 @@ class MqttConnection extends EventEmitter {
       opts.rejectUnauthorized = false;
     }
 
-    try {
-      this.#conn = await mqtt.connect(this.#opts.uri, opts);
-    } catch (err) {
-      return void setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
-    }
+    this.#conn = mqtt.connect(this.#opts.uri, opts);
     this.#conn.on('close', this.#onClose.bind(this));
     this.#conn.on('connect', this.#onConnect.bind(this));
     this.#conn.on('error', this.#onError.bind(this));
@@ -254,14 +250,20 @@ class MqttConnection extends EventEmitter {
     }
 
     if (this.#status !== Status.Closing && this.#status !== Status.Closed) {
-      this.#status = Status.Connecting;
-      this.emit(Events.Status, Status.Connecting);
-      this.#innerConnect();
+      this.#status = Status.Disconnected;
+      this.emit(Events.Status, Status.Disconnected);
+      setTimeout(() => {
+        if (this.#status !== Status.Closing && this.#status !== Status.Closed) {
+          this.#status = Status.Connecting;
+          this.emit(Events.Status, Status.Connecting);
+          this.#innerConnect();
+        }
+      }, this.#opts.reconnectMillis);
     }
   }
 
   #onConnect() {
-    if (this.#conn) {
+    if (this.#conn && this.#status === Status.Connecting) {
       this.#status = Status.Connected;
       this.emit(Events.Status, Status.Connected);
     }

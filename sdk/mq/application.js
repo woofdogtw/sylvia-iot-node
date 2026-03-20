@@ -155,7 +155,6 @@ class ApplicationMgr extends EventEmitter {
     this.#uldata.connect();
 
     this.#dldata.on(Events.Status, this.#gmqStatusHandler.bind(this));
-    this.#dldata.setMsgHandler(this.#gmqMsgHandler.bind(this));
     this.#dldata.connect();
 
     this.#dldataResp.on(Events.Status, this.#gmqStatusHandler.bind(this));
@@ -248,7 +247,7 @@ class ApplicationMgr extends EventEmitter {
     if (!data || typeof data !== DataTypes.Object || Array.isArray(data)) {
       throw Error('`data` is not an object');
     } else if (!data.correlationId || typeof data.correlationId !== DataTypes.String) {
-      throw Error(ErrParamCorrId);
+      throw Error(Errors.ErrParamCorrId);
     } else if (data.deviceId !== undefined && typeof data.deviceId !== DataTypes.String) {
       throw Error('`data.deviceId` is not a string');
     } else if (data.networkCode !== undefined && typeof data.networkCode !== DataTypes.String) {
@@ -266,7 +265,7 @@ class ApplicationMgr extends EventEmitter {
       throw Error('`data.extension` is not an object');
     }
     if (!data.deviceId) {
-      if ((data.networkCode && !data.networkAddr) || (!data.networkCode && data.networkAddr)) {
+      if (!data.networkCode || !data.networkAddr) {
         throw Error(Errors.ErrParamDev);
       }
     }
@@ -286,7 +285,7 @@ class ApplicationMgr extends EventEmitter {
   /**
    * The handler for the gmq.Queue#status events.
    */
-  #gmqStatusHandler(_queue, _status) {
+  #gmqStatusHandler(_status) {
     let status;
     if (
       this.#uldata.status() === Status.Connected &&

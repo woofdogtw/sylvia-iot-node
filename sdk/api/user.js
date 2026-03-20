@@ -42,7 +42,7 @@ async function get(client) {
 
   const res = await client.request(HttpMethod.Get, '/api/v1/user');
   if (res.status !== 200) {
-    throw SdkError({ code: ErrorCode.Rsc, message: JSON.stringify(res.body) });
+    throw new SdkError({ code: ErrorCode.Rsc, message: JSON.stringify(res.body) });
   }
   const data = res.body.data;
   data.createdAt = new Date(data.createdAt);
@@ -71,7 +71,7 @@ async function update(client, data) {
 
   const res = await client.request(HttpMethod.Patch, '/api/v1/user', { data });
   if (res.status !== 204) {
-    return { code: ErrorCode.Rsc, message: JSON.stringify(body) };
+    throw new SdkError({ code: ErrorCode.Rsc, message: JSON.stringify(res.body) });
   }
 }
 

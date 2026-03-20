@@ -16,20 +16,20 @@ jobs:
     runs-on: ubuntu-24.04
     services:
       rabbitmq:
-        image: rabbitmq:4.2.1-management-alpine
+        image: rabbitmq:4.2.5-management-alpine
         ports:
           - 5671:5671
           - 5672:5672
           - 15672:15672
       emqx:
-        image: emqx/emqx:6.0.1
+        image: emqx/emqx:6.1.0
         ports:
           - 1883:1883
           - 8883:8883
           - 18083:18083
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Install tools
         run: |
           sudo apt -y install lcov
