@@ -138,7 +138,6 @@ class NetworkMgr extends EventEmitter {
     this.#mgrMsgHandler = handler;
 
     this.#uldata.on(Events.Status, this.#gmqStatusHandler.bind(this));
-    this.#uldata.setMsgHandler(this.#gmqMsgHandler.bind(this));
     this.#uldata.connect();
 
     this.#dldata.on(Events.Status, this.#gmqStatusHandler.bind(this));
@@ -146,7 +145,6 @@ class NetworkMgr extends EventEmitter {
     this.#dldata.connect();
 
     this.#dldataResult.on(Events.Status, this.#gmqStatusHandler.bind(this));
-    this.#dldataResult.setMsgHandler(this.#gmqMsgHandler.bind(this));
     this.#dldataResult.connect();
 
     this.#ctrl.on(Events.Status, this.#gmqStatusHandler.bind(this));
@@ -290,7 +288,7 @@ class NetworkMgr extends EventEmitter {
   /**
    * The handler for the gmq.Queue#status events.
    */
-  #gmqStatusHandler(_queue, _status) {
+  #gmqStatusHandler(_status) {
     let status;
     if (
       this.#uldata.status() === Status.Connected &&

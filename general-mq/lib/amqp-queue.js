@@ -46,6 +46,13 @@ const amqplibConsts = {
  */
 
 /**
+ * Connection status changed handler.
+ *
+ * @callback OnConnStatusChanged
+ * @param {Status} status The latest status of the connection.
+ */
+
+/**
  * Manages an AMQP queue.
  *
  * @class AmqpQueue
@@ -115,7 +122,8 @@ class AmqpQueue extends EventEmitter {
     this.#channel = null;
     this.#msgHandler = null;
 
-    this.#conn.on(Events.Status, this.#onConnStatusChanged.bind(this));
+    this.#onConnStatusChangedBound = this.#onConnStatusChanged.bind(this);
+    this.#conn.on(Events.Status, this.#onConnStatusChangedBound);
   }
 
   /**
@@ -187,6 +195,7 @@ class AmqpQueue extends EventEmitter {
    * @throws {SdkError}
    */
   async close() {
+    this.#conn.removeListener(Events.Status, this.#onConnStatusChangedBound);
     if (this.#status === Status.Closing || this.#status === Status.Closed) {
       return;
     } else if (!this.#channel) {
@@ -233,7 +242,8 @@ class AmqpQueue extends EventEmitter {
     const routingKey = this.#opts.broadcast ? '' : this.#opts.name;
     if (this.#opts.reliable) {
       await new Promise((resolve, reject) => {
-        this.#channel.publish(exchange, routingKey, payload, { mandatory: true }, (err) => {
+        const opts = { mandatory: true, persistent: this.#opts.persistent };
+        this.#channel.publish(exchange, routingKey, payload, opts, (err) => {
           if (err) {
             return reject(new SdkError(err.message));
           }
@@ -310,6 +320,12 @@ class AmqpQueue extends EventEmitter {
         ? await rawConn.createConfirmChannel()
         : await rawConn.createChannel();
 
+      if (this.#status !== Status.Connecting) {
+        channel.close().catch(() => {});
+        this.#connProcessing = false;
+        return;
+      }
+
       // Declare resources for unicast or broadcast.
       let qname;
       if (this.#opts.broadcast) {
@@ -317,6 +333,12 @@ class AmqpQueue extends EventEmitter {
       } else {
         await this.#createUnicast(channel);
         qname = this.#opts.name;
+      }
+
+      if (this.#status !== Status.Connecting) {
+        channel.close().catch(() => {});
+        this.#connProcessing = false;
+        return;
       }
 
       this.#connProcessing = false;
@@ -331,6 +353,14 @@ class AmqpQueue extends EventEmitter {
       if (this.#opts.isRecv) {
         await channel.prefetch(this.#opts.prefetch);
         await channel.consume(qname, this.#innerOnMessage.bind(this), {});
+      }
+
+      if (this.#status !== Status.Connecting) {
+        this.#channel.removeAllListeners();
+        this.#channel.close().catch(() => {});
+        this.#channel = null;
+        this.#connProcessing = false;
+        return;
       }
 
       this.#status = Status.Connected;
@@ -362,7 +392,7 @@ class AmqpQueue extends EventEmitter {
   }
 
   /**
-   * To create resouces for the broadcast queue.
+   * To create resources for the broadcast queue.
    *
    * @async
    * @param {amqplib.Channel} channel
@@ -380,8 +410,8 @@ class AmqpQueue extends EventEmitter {
       }
 
       const q = await channel.assertQueue('', { exclusive: true });
-      await channel.bindQueue(q.name, this.#opts.name, '', {});
-      return q.name;
+      await channel.bindQueue(q.queue, this.#opts.name, '', {});
+      return q.queue;
     } catch (err) {
       throw new SdkError(err.message);
     }
@@ -430,13 +460,20 @@ class AmqpQueue extends EventEmitter {
     if (
       this.#status === Status.Closing ||
       this.#status === Status.Closed ||
-      this.#status === Status.Connecting
+      this.#status === Status.Connecting ||
+      this.#status === Status.Disconnected
     ) {
       return;
     }
-    this.#status = Status.Connecting;
-    this.emit(Events.Status, Status.Connecting);
-    setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
+    this.#status = Status.Disconnected;
+    this.emit(Events.Status, Status.Disconnected);
+    setTimeout(() => {
+      if (this.#status !== Status.Closing && this.#status !== Status.Closed) {
+        this.#status = Status.Connecting;
+        this.emit(Events.Status, Status.Connecting);
+        this.#innerConnect();
+      }
+    }, this.#opts.reconnectMillis);
   }
 
   #onDrain() {}
@@ -460,6 +497,8 @@ class AmqpQueue extends EventEmitter {
   #channel;
   /** @type {AmqpQueueMsgHandler} */
   #msgHandler;
+  /** @type {OnConnStatusChanged} */
+  #onConnStatusChangedBound;
 }
 
 module.exports = {

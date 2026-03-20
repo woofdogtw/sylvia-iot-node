@@ -46,6 +46,13 @@ const amqplibConsts = {
  */
 
 /**
+ * Connection status changed handler.
+ *
+ * @callback OnConnStatusChanged
+ * @param {Status} status The latest status of the connection.
+ */
+
+/**
  * Manages an AMQP queue.
  *
  * @class AmqpQueue
@@ -115,7 +122,8 @@ class AmqpQueue extends EventEmitter {
     this.#channel = null;
     this.#msgHandler = null;
 
-    this.#conn.on(Events.Status, this.#onConnStatusChanged.bind(this));
+    this.#onConnStatusChangedBound = this.#onConnStatusChanged.bind(this);
+    this.#conn.on(Events.Status, this.#onConnStatusChangedBound);
   }
 
   /**
@@ -190,6 +198,7 @@ class AmqpQueue extends EventEmitter {
       callback = null;
     }
 
+    this.#conn.removeListener(Events.Status, this.#onConnStatusChangedBound);
     if (this.#status === Status.Closing || this.#status === Status.Closed) {
       if (callback) {
         return void process.nextTick(() => callback(null));
@@ -201,6 +210,7 @@ class AmqpQueue extends EventEmitter {
       if (callback) {
         return void process.nextTick(() => callback(null));
       }
+      return;
     }
 
     this.#status = Status.Closing;
@@ -241,7 +251,8 @@ class AmqpQueue extends EventEmitter {
     const exchange = this.#opts.broadcast ? this.#opts.name : '';
     const routingKey = this.#opts.broadcast ? '' : this.#opts.name;
     if (this.#opts.reliable) {
-      this.#channel.publish(exchange, routingKey, payload, { mandatory: true }, (err) => {
+      const opts = { mandatory: true, persistent: this.#opts.persistent };
+      this.#channel.publish(exchange, routingKey, payload, opts, (err) => {
         if (err) {
           return void callback(err);
         }
@@ -326,6 +337,10 @@ class AmqpQueue extends EventEmitter {
             if (err) {
               return void cb(err);
             }
+            if (self.#status !== Status.Connecting) {
+              ch.close(() => {});
+              return void cb(Error('closed'));
+            }
             channel = ch;
             cb(null);
           });
@@ -340,6 +355,10 @@ class AmqpQueue extends EventEmitter {
         },
         // Set handlers before consuming to prevent `onMessage`.
         function (qname, cb) {
+          if (self.#status !== Status.Connecting) {
+            channel.close(() => {});
+            return void cb(Error('closed'));
+          }
           channel.on('close', self.#onClose.bind(self));
           channel.on('drain', self.#onDrain.bind(self));
           channel.on('error', self.#onError.bind(self));
@@ -364,13 +383,24 @@ class AmqpQueue extends EventEmitter {
             self.#channel.removeAllListeners();
             self.#channel = null;
           }
+          if (self.#status !== Status.Connecting) {
+            return;
+          }
           self.emit(Events.Error, err);
           return void setTimeout(() => self.#innerConnect(), self.#opts.reconnectMillis);
         }
 
+        if (self.#status !== Status.Connecting) {
+          if (self.#channel) {
+            self.#channel.removeAllListeners();
+            self.#channel.close(() => {});
+            self.#channel = null;
+          }
+          return;
+        }
         self.#status = Status.Connected;
         self.emit(Events.Status, Status.Connected);
-      }
+      },
     );
   }
 
@@ -390,7 +420,7 @@ class AmqpQueue extends EventEmitter {
   }
 
   /**
-   * To create resouces for the broadcast queue.
+   * To create resources for the broadcast queue.
    *
    * @param {amqplib.Channel} channel
    * @param {function} callback
@@ -417,13 +447,13 @@ class AmqpQueue extends EventEmitter {
             if (err) {
               return void cb(err);
             }
-            channel.bindQueue(q.queue, self.#opts.name, '', {}, (err) => cb(err, q.name));
+            channel.bindQueue(q.queue, self.#opts.name, '', {}, (err) => cb(err, q.queue));
           });
         },
       ],
       (err, qname) => {
         callback(err, qname);
-      }
+      },
     );
   }
 
@@ -467,13 +497,20 @@ class AmqpQueue extends EventEmitter {
     if (
       this.#status === Status.Closing ||
       this.#status === Status.Closed ||
-      this.#status === Status.Connecting
+      this.#status === Status.Connecting ||
+      this.#status === Status.Disconnected
     ) {
       return;
     }
-    this.#status = Status.Connecting;
-    this.emit(Events.Status, Status.Connecting);
-    setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
+    this.#status = Status.Disconnected;
+    this.emit(Events.Status, Status.Disconnected);
+    setTimeout(() => {
+      if (this.#status !== Status.Closing && this.#status !== Status.Closed) {
+        this.#status = Status.Connecting;
+        this.emit(Events.Status, Status.Connecting);
+        this.#innerConnect();
+      }
+    }, this.#opts.reconnectMillis);
   }
 
   #onDrain() {}
@@ -497,6 +534,8 @@ class AmqpQueue extends EventEmitter {
   #channel;
   /** @type {AmqpQueueMsgHandler} */
   #msgHandler;
+  /** @type {OnConnStatusChanged} */
+  #onConnStatusChangedBound;
 }
 
 module.exports = {

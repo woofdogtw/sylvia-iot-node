@@ -57,7 +57,7 @@ function authMiddleware(authUri) {
         } else if (authRes.statusCode !== 200) {
           return void res.status(503).json({
             code: 'err_int_msg',
-            message: `auth error with status code: ${res.statusCode}`,
+            message: `auth error with status code: ${authRes.statusCode}`,
           });
         }
 

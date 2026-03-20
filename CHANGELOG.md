@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.2.4 - 2026-03-20
+
+### Changed
+
+- Update dependencies.
+
+### Fixed
+
+- Fix for AI code review.
+  - **general-mq**: Fix missing `new` keyword for SdkError in MQTT queue.
+  - **general-mq**: Fix missing `persistent` option in AMQP reliable publish.
+  - **general-mq**: Fix connection listener leak on queue close.
+  - **general-mq**: Fix broadcast queue using wrong property (`q.name` → `q.queue`).
+  - **general-mq**: Fix race conditions of `close()` interleaving with `#innerConnect()`.
+  - **general-mq**: Add `Disconnected` state transition to match Rust implementation.
+  - **general-mq**: Fix AMQP connect timeout option not being passed.
+  - **sdk**: Fix missing `new` keyword for SdkError in HTTP API.
+  - **sdk**: Fix `user.js` returning error object instead of throwing.
+  - **sdk**: Fix wrong variable reference (`body` → `res.body`) in user API.
+  - **sdk**: Fix wrong variable reference (`res.statusCode` → `authRes.statusCode`) in auth middleware.
+  - **sdk**: Fix `sendDlData` validation allowing empty networkCode/networkAddr.
+  - **sdk**: Fix `#gmqStatusHandler` receiving wrong parameter count.
+  - **sdk**: Fix `removeConnection` closing connection regardless of reference count.
+
 ## 0.2.3 - 2025-11-28
 
 ### Changed

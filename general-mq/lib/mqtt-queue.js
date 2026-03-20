@@ -38,6 +38,13 @@ const DEF_RECONN = 1000;
  */
 
 /**
+ * Connection status changed handler.
+ *
+ * @callback OnConnStatusChanged
+ * @param {Status} status The latest status of the connection.
+ */
+
+/**
  * Manages an MQTT queue.
  *
  * @class MqttQueue
@@ -100,7 +107,8 @@ class MqttQueue extends EventEmitter {
     this.#connProcessing = false;
     this.#msgHandler = null;
 
-    this.#conn.on(Events.Status, this.#onConnStatusChanged.bind(this));
+    this.#onConnStatusChangedBound = this.#onConnStatusChanged.bind(this);
+    this.#conn.on(Events.Status, this.#onConnStatusChangedBound);
   }
 
   /**
@@ -163,7 +171,7 @@ class MqttQueue extends EventEmitter {
         this.#opts.name,
         this.#topic(),
         this.#opts.reliable,
-        this.#innerOnMessage.bind(this)
+        this.#innerOnMessage.bind(this),
       );
     }
     this.#status = Status.Connecting;
@@ -180,21 +188,19 @@ class MqttQueue extends EventEmitter {
    * @throws {SdkError}
    */
   async close() {
-    if (
-      this.#status === Status.Closing ||
-      this.#status === Status.Closed ||
-      !this.#conn.getRawConnection()
-    ) {
+    this.#conn.removeListener(Events.Status, this.#onConnStatusChangedBound);
+    if (this.#status === Status.Closing || this.#status === Status.Closed) {
       return;
     }
 
-    let err;
     this.#status = Status.Closing;
     this.emit(Events.Status, Status.Closing);
+
+    let err;
+    this.#conn.removePacketHandler(this.#opts.name);
     const rawConn = this.#conn.getRawConnection();
-    await rawConn.unsubscribeAsync(this.#topic()).catch((e) => (err = e));
-    if (this.#opts.isRecv) {
-      this.#conn.removePacketHandler(this.#opts.name);
+    if (rawConn) {
+      await rawConn.unsubscribeAsync(this.#topic()).catch((e) => (err = e));
     }
     this.#status = Status.Closed;
     this.emit(Events.Status, Status.Closed);
@@ -226,7 +232,7 @@ class MqttQueue extends EventEmitter {
       qos: this.#opts.reliable ? 1 : 0,
     };
     await rawConn.publishAsync(this.#topic(), payload, opts).catch((err) => {
-      throw SdkError(err.message);
+      throw new SdkError(err.message);
     });
   }
 
@@ -293,6 +299,9 @@ class MqttQueue extends EventEmitter {
       return void setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
     }
 
+    if (this.#status !== Status.Connecting) {
+      return;
+    }
     this.#status = Status.Connected;
     this.emit(Events.Status, Status.Connected);
   }
@@ -365,6 +374,8 @@ class MqttQueue extends EventEmitter {
   #connProcessing;
   /** @type {MqttQueueMsgHandler} */
   #msgHandler;
+  /** @type {OnConnStatusChanged} */
+  #onConnStatusChangedBound;
 }
 
 module.exports = {

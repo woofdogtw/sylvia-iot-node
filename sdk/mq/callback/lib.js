@@ -164,9 +164,11 @@ function removeConnection(connPool, hostUri, count, callback) {
   conn.count -= count;
   if (conn.count <= 0) {
     connPool.delete(hostUri);
+    conn.conn.removeAllListeners();
+    conn.conn.close((err) => callback(err || null));
+    return;
   }
-  conn.conn.removeAllListeners();
-  conn.conn.close((err) => callback(err || null));
+  return void process.nextTick(() => callback(null));
 }
 
 /**

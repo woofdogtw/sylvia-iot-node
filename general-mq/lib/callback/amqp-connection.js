@@ -156,13 +156,20 @@ class AmqpConnection extends EventEmitter {
   }
 
   #innerConnect() {
-    const opts = {};
+    const opts = {
+      timeout: this.#opts.connectTimeoutMillis,
+    };
     if (this.#opts.insecure) {
       opts.rejectUnauthorized = false;
     }
     amqplib.connect(this.#opts.uri, opts, (err, conn) => {
       if (err) {
         return void setTimeout(() => this.#innerConnect(), this.#opts.reconnectMillis);
+      }
+
+      if (this.#status !== Status.Connecting) {
+        conn.close(() => {});
+        return;
       }
 
       conn.on('close', this.#onClose.bind(this));
@@ -180,9 +187,15 @@ class AmqpConnection extends EventEmitter {
     }
 
     if (this.#status !== Status.Closing && this.#status !== Status.Closed) {
-      this.#status = Status.Connecting;
-      this.emit(Events.Status, Status.Connecting);
-      this.#innerConnect();
+      this.#status = Status.Disconnected;
+      this.emit(Events.Status, Status.Disconnected);
+      setTimeout(() => {
+        if (this.#status !== Status.Closing && this.#status !== Status.Closed) {
+          this.#status = Status.Connecting;
+          this.emit(Events.Status, Status.Connecting);
+          this.#innerConnect();
+        }
+      }, this.#opts.reconnectMillis);
     }
   }
 
