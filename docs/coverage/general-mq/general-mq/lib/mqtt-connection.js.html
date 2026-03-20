@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.14% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>86/101</span>
+                <span class='fraction'>85/102</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.85% </span>
+                <span class="strong">82.85% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>85/99</span>
+                <span class='fraction'>87/105</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">86.86% </span>
+                <span class="strong">84.15% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>86/99</span>
+                <span class='fraction'>85/101</span>
             </div>
         
             
@@ -365,7 +365,9 @@
 <a name='L300'></a><a href='#L300'>300</a>
 <a name='L301'></a><a href='#L301'>301</a>
 <a name='L302'></a><a href='#L302'>302</a>
-<a name='L303'></a><a href='#L303'>303</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -543,7 +545,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">81x</span>
+<span class="cline-any cline-yes">59x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -581,11 +583,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">23x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">22x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -602,10 +604,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-yes">28x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">28x</span>
 <span class="cline-any cline-yes">28x</span>
 <span class="cline-any cline-yes">28x</span>
@@ -624,6 +622,12 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -797,7 +801,7 @@ class MqttConnection extends EventEmitter {
   }
 &nbsp;
   /**
-   * To connect to the message broker. The `AmqpConnection` will report status with Status.
+   * To connect to the message broker. The `MqttConnection` will report status with Status.
    */
   connect() {
     if (this.#status !== Status.Closed &amp;&amp; this.#status !== Status.Closing) {
@@ -890,7 +894,7 @@ class MqttConnection extends EventEmitter {
     this.#packetHandlers.delete(name);
   }
 &nbsp;
-  async #innerConnect() {
+  #innerConnect() {
     const urlInfo = new URL(this.#opts.uri);
     const opts = {
       reconnectPeriod: this.#opts.reconnectMillis,
@@ -903,11 +907,7 @@ class MqttConnection extends EventEmitter {
 <span class="cstat-no" title="statement not covered" >      opts.rejectUnauthorized = false;</span>
     }
 &nbsp;
-    try {
-      this.#conn = await mqtt.connect(this.#opts.uri, opts);
-    } catch (err) {
-<span class="cstat-no" title="statement not covered" >      return void setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >this.#innerConnect(),</span> this.#opts.reconnectMillis);</span>
-    }
+    this.#conn = mqtt.connect(this.#opts.uri, opts);
     this.#conn.on('close', this.#onClose.bind(this));
     this.#conn.on('connect', this.#onConnect.bind(this));
     this.#conn.on('error', this.#onError.bind(this));
@@ -923,14 +923,20 @@ class MqttConnection extends EventEmitter {
     }
 &nbsp;
     <span class="missing-if-branch" title="if path not taken" >I</span>if (this.#status !== Status.Closing &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >this.#status !== Status.Closed)</span> {
-<span class="cstat-no" title="statement not covered" >      this.#status = Status.Connecting;</span>
-<span class="cstat-no" title="statement not covered" >      this.emit(Events.Status, Status.Connecting);</span>
-<span class="cstat-no" title="statement not covered" >      this.#innerConnect();</span>
+<span class="cstat-no" title="statement not covered" >      this.#status = Status.Disconnected;</span>
+<span class="cstat-no" title="statement not covered" >      this.emit(Events.Status, Status.Disconnected);</span>
+<span class="cstat-no" title="statement not covered" >      setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        if (this.#status !== Status.Closing &amp;&amp; this.#status !== Status.Closed) {</span>
+<span class="cstat-no" title="statement not covered" >          this.#status = Status.Connecting;</span>
+<span class="cstat-no" title="statement not covered" >          this.emit(Events.Status, Status.Connecting);</span>
+<span class="cstat-no" title="statement not covered" >          this.#innerConnect();</span>
+        }
+      }, this.#opts.reconnectMillis);
     }
   }
 &nbsp;
   #onConnect() {
-    <span class="missing-if-branch" title="else path not taken" >E</span>if (this.#conn) {
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (this.#conn &amp;&amp; this.#status === Status.Connecting) {
       this.#status = Status.Connected;
       this.emit(Events.Status, Status.Connected);
     }
@@ -976,7 +982,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-28T15:16:47.950Z
+                at 2026-03-20T14:38:56.266Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

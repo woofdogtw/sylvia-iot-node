@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">99.16% </span>
+                <span class="strong">99.15% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>119/120</span>
+                <span class='fraction'>118/119</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">99.02% </span>
+                <span class="strong">99% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>102/103</span>
+                <span class='fraction'>100/101</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">99.12% </span>
+                <span class="strong">99.11% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>113/114</span>
+                <span class='fraction'>112/113</span>
             </div>
         
             
@@ -465,8 +465,7 @@
 <a name='L400'></a><a href='#L400'>400</a>
 <a name='L401'></a><a href='#L401'>401</a>
 <a name='L402'></a><a href='#L402'>402</a>
-<a name='L403'></a><a href='#L403'>403</a>
-<a name='L404'></a><a href='#L404'>404</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L403'></a><a href='#L403'>403</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -625,7 +624,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-yes">20x</span>
@@ -774,7 +772,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">164x</span>
+<span class="cline-any cline-yes">160x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -782,14 +780,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">144x</span>
+<span class="cline-any cline-yes">140x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">164x</span>
-<span class="cline-any cline-yes">143x</span>
+<span class="cline-any cline-yes">160x</span>
+<span class="cline-any cline-yes">140x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1027,7 +1025,6 @@ class ApplicationMgr extends EventEmitter {
     this.#uldata.connect();
 &nbsp;
     this.#dldata.on(Events.Status, this.#gmqStatusHandler.bind(this));
-    this.#dldata.setMsgHandler(this.#gmqMsgHandler.bind(this));
     this.#dldata.connect();
 &nbsp;
     this.#dldataResp.on(Events.Status, this.#gmqStatusHandler.bind(this));
@@ -1137,7 +1134,7 @@ class ApplicationMgr extends EventEmitter {
     if (!data || typeof data !== DataTypes.Object || Array.isArray(data)) {
       throw Error('`data` is not an object');
     } else if (!data.correlationId || typeof data.correlationId !== DataTypes.String) {
-      throw Error(ErrParamCorrId);
+      throw Error(Errors.ErrParamCorrId);
     } else if (data.deviceId !== undefined &amp;&amp; typeof data.deviceId !== DataTypes.String) {
       throw Error('`data.deviceId` is not a string');
     } else if (data.networkCode !== undefined &amp;&amp; typeof data.networkCode !== DataTypes.String) {
@@ -1155,7 +1152,7 @@ class ApplicationMgr extends EventEmitter {
       throw Error('`data.extension` is not an object');
     }
     if (!data.deviceId) {
-      if ((data.networkCode &amp;&amp; !data.networkAddr) || (!data.networkCode &amp;&amp; data.networkAddr)) {
+      if (!data.networkCode || !data.networkAddr) {
         throw Error(Errors.ErrParamDev);
       }
     }
@@ -1175,7 +1172,7 @@ class ApplicationMgr extends EventEmitter {
   /**
    * The handler for the gmq.Queue#status events.
    */
-  #gmqStatusHandler(_queue, _status) {
+  #gmqStatusHandler(_status) {
     let status;
     if (
       this.#uldata.status() === Status.Connected &amp;&amp;
@@ -1279,7 +1276,7 @@ module.exports = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-28T15:17:03.012Z
+                at 2026-03-20T14:39:10.574Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
