@@ -163,9 +163,9 @@ async function removeConnection(connPool, hostUri, count) {
   conn.count -= count;
   if (conn.count <= 0) {
     connPool.delete(hostUri);
+    conn.conn.removeAllListeners();
+    await conn.conn.close();
   }
-  conn.conn.removeAllListeners();
-  await conn.conn.close();
 }
 
 /**

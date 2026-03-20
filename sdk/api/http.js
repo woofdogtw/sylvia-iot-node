@@ -97,7 +97,7 @@ class Client {
         .buffer(false)
         .ok((res) => !!res)
         .catch((err) => {
-          throw SdkError({ code: ErrorCode.Rsc, message: `${err}` });
+          throw new SdkError({ code: ErrorCode.Rsc, message: `${err}` });
         });
 
       if (res.statusCode === 401) {
@@ -117,7 +117,7 @@ class Client {
         body: retBody,
       };
     }
-    throw SdkError({
+    throw new SdkError({
       code: ErrorCode.Rsc,
       message: 'exceed retry',
     });
@@ -148,10 +148,10 @@ class Client {
           code: ErrorCode.Rsc,
           message: `${err}`,
         };
-        throw SdkError(JSON.stringify(body));
+        throw new SdkError(JSON.stringify(body));
       });
     if (res.statusCode !== 200) {
-      throw SdkError(JSON.stringify(res.body));
+      throw new SdkError(JSON.stringify(res.body));
     }
     return res.body.access_token;
   }

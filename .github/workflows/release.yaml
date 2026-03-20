@@ -4,7 +4,7 @@ on:
     tags:
       - v*
 env:
-  GHR_VER: v0.17.0
+  GHR_VER: v0.18.0
   BIN_DIR: dist
   SBOM_DIR: sbom
 permissions:
@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.ref_name }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.ref_name }}
       - name: Prepare assets

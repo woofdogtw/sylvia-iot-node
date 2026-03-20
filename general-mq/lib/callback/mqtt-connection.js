@@ -127,7 +127,7 @@ class MqttConnection extends EventEmitter {
   }
 
   /**
-   * To connect to the message broker. The `AmqpConnection` will report status with Status.
+   * To connect to the message broker. The `MqttConnection` will report status with Status.
    */
   connect() {
     if (this.#status !== Status.Closed && this.#status !== Status.Closing) {
@@ -255,14 +255,20 @@ class MqttConnection extends EventEmitter {
     }
 
     if (this.#status !== Status.Closing && this.#status !== Status.Closed) {
-      this.#status = Status.Connecting;
-      this.emit(Events.Status, Status.Connecting);
-      this.#innerConnect();
+      this.#status = Status.Disconnected;
+      this.emit(Events.Status, Status.Disconnected);
+      setTimeout(() => {
+        if (this.#status !== Status.Closing && this.#status !== Status.Closed) {
+          this.#status = Status.Connecting;
+          this.emit(Events.Status, Status.Connecting);
+          this.#innerConnect();
+        }
+      }, this.#opts.reconnectMillis);
     }
   }
 
   #onConnect() {
-    if (this.#conn) {
+    if (this.#conn && this.#status === Status.Connecting) {
       this.#status = Status.Connected;
       this.emit(Events.Status, Status.Connected);
     }
